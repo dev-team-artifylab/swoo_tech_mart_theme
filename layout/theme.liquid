@@ -17,6 +17,11 @@
       {{ settings.type_primary_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
     {% endunless %}
 
+    {% comment %} Google Fonts: Inter (all weights 100-900) {% endcomment %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
     {% # Load and preload the critical CSS %}
     {{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}
 
@@ -31,11 +36,11 @@
 
   <body>
     {% sections 'header-group' %}
-
-
-    
+    <h1>Hello</h1>
     {{ content_for_layout }}
 
+
+    <p class="bg-secondary text-6xl">Hi all</p>
     {% sections 'footer-group' %}
   </body>
 </html>
