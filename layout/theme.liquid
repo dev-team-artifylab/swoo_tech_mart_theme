@@ -25,7 +25,7 @@
 
     {{ content_for_header }}
 
-    {{ 'tailwind.output.css' | asset_url | stylesheet_tag }}
+    {{ 'tailwind.output.css' |  asset_url |  stylesheet_tag }}
 
   </head>
 
@@ -33,6 +33,7 @@
     {% sections 'header-group' %}
 
 
+    
     {{ content_for_layout }}
 
     {% sections 'footer-group' %}
