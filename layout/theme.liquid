@@ -24,10 +24,14 @@
     {% render 'meta-tags' %}
 
     {{ content_for_header }}
+
+    {{ 'tailwind.output.css' | asset_url | stylesheet_tag }}
+
   </head>
 
   <body>
     {% sections 'header-group' %}
+
 
     {{ content_for_layout }}
 
