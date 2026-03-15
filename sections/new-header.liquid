@@ -1,0 +1,223 @@
+<div class="w-full h-[80px]  text-sm text-gray-600 ">
+  <div class="flex justify-between items-center h-full px-6">
+    
+    <!-- Left Side -->
+    <div class="flex items-center gap-4">
+      <span class="bg-gray-100 px-2 py-1 rounded text-xs font-sans">Hotline 24/7</span>
+      <span class="font-bold text-black">{{ section.settings.hotline_number }}</span>
+    </div>
+
+    <!-- Right Side -->
+    <div class="flex items-center gap-4 px-2 py-1 rounded text-xs font-sans">
+      <a href="/pages/sell" class="hover:text-green-600">Sell on Swoo</a>
+      <a href="/apps/track-order" class="hover:text-green-600">Order Tracking</a>
+
+      <!-- Currency Dropdown -->
+      <div class="flex items-center gap-2 cursor-pointer border-l pl-4">
+        <span>USD</span>
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </div>
+
+      <!-- Language Dropdown -->
+      <div class="flex items-center gap-2 cursor-pointer">
+        <span class="w-5 h-3 bg-red-500 inline-block"></span>
+        <span>Eng</span>
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<header class="w-full py-5 bg-white">
+  <div class="w-full flex justify-between items-center px-6">
+    
+    <!-- Logo -->
+    <div class="flex items-center space-x-3">
+      {% if section.settings.logo_image %}
+        <img src="{{ section.settings.logo_image | image_url }}" class="h-10">
+      {% else %}
+        <div class="flex items-center gap-2">
+          <span class="text-xl font-bold" style="color: {{ section.settings.brand_color }}">{{ section.settings.logo_text_main }}</span>
+          <span class="text-sm font-semibold text-gray-500">{{ section.settings.logo_text_sub }}</span>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Navigation -->
+    <nav class="hidden lg:flex space-x-8 font-sans text-sm gap-4">
+      {% for link in linklists[section.settings.main_menu].links %}
+        <a href="{{ link.url }}" class="flex items-center hover:text-green-600 uppercase">
+          {{ link.title }}
+          {% if link.links.size > 0 %}
+            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M19 9l-7 7-7-7"></path>
+            </svg>
+          {% endif %}
+        </a>
+      {% endfor %}
+    </nav>
+
+    <!-- Actions -->
+    <div class="flex items-center space-x-5">
+      
+      <!-- Wishlist -->
+      <button class="p-3 bg-gray-50 rounded-full hover:bg-gray-100">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+        </svg>
+      </button>
+
+      <!-- Account -->
+      <div class="flex items-center space-x-3">
+        <div class="p-3 bg-gray-50 rounded-full">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+          </svg>
+        </div>
+        <div class="hidden xl:block">
+          <p class="text-[10px] text-gray-400 font-bold uppercase">Welcome</p>
+          <p class="text-sm font-black uppercase">Log In / Register</p>
+        </div>
+      </div>
+
+      <!-- Cart -->
+      <div class="flex items-center space-x-3">
+        <div class="relative p-3 bg-gray-50 rounded-full">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+          <span class="absolute top-0 right-0 bg-green-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">0</span>
+        </div>
+        <div class="hidden xl:block">
+          <p class="text-[10px] text-gray-400 font-bold uppercase">Cart</p>
+          <p class="text-sm font-black">{{ cart.total_price | money }}</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</header>
+
+
+
+{% schema %}
+{
+  "name": "Custom Header",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Top Bar Settings"
+    },
+    {
+      "type": "text",
+      "id": "hotline_label",
+      "label": "Hotline Label",
+      "default": "Hotline 24/7"
+    },
+    {
+      "type": "text",
+      "id": "hotline_number",
+      "label": "Hotline Number",
+      "default": "(025) 3886 25 16"
+    },
+    {
+      "type": "text",
+      "id": "top_link_1_text",
+      "label": "Left Link 1 Text",
+      "default": "Sell on Swoo"
+    },
+    {
+      "type": "url",
+      "id": "top_link_1_url",
+      "label": "Left Link 1 URL"
+    },
+    {
+      "type": "text",
+      "id": "top_link_2_text",
+      "label": "Left Link 2 Text",
+      "default": "Order Tracking"
+    },
+    {
+      "type": "url",
+      "id": "top_link_2_url",
+      "label": "Left Link 2 URL"
+    },
+    {
+      "type": "header",
+      "content": "Brand & Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_image",
+      "label": "Logo Image (Optional)"
+    },
+    {
+      "type": "text",
+      "id": "logo_text_main",
+      "label": "Logo Text Main",
+      "default": "Swoo"
+    },
+    {
+      "type": "text",
+      "id": "logo_text_sub",
+      "label": "Logo Text Subtitle",
+      "default": "Tech Mart"
+    },
+    {
+      "type": "color",
+      "id": "brand_color",
+      "label": "Brand Accent Color",
+      "default": "#22c55e"
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "main_menu",
+      "label": "Main Menu Select",
+      "default": "main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account_labels",
+      "label": "Show Account/Cart Labels",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "currency",
+      "name": "Currency Picker",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "currency_code",
+          "label": "Default Currency",
+          "default": "USD"
+        }
+      ]
+    },
+    {
+      "type": "language",
+      "name": "Language Picker",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "lang_code",
+          "label": "Language Code",
+          "default": "Eng"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

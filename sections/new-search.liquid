@@ -1,0 +1,93 @@
+<section class="w-full py-4">
+  <div class="w-full mx-auto px-4">
+    <div class="flex flex-col lg:flex-row items-center justify-between rounded-xl p-3 lg:p-4" 
+         style="background-color: {{ section.settings.bg_color }};">
+      
+      <!-- Search Bar -->
+      <div class="w-full lg:w-1/2 bg-white rounded-full flex items-center px-6 py-3 shadow-sm">
+        <div class="hidden sm:flex items-center border-r border-gray-200 pr-4 mr-4 cursor-pointer group">
+          <span class="text-sm  font-sans text-bold text-gray-800">{{ section.settings.cat_label }}</span>
+          <svg class="w-4 h-4 ml-2 text-gray-500  group-hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+
+        <form action="{{ routes.search_url }}" method="get" class="flex-grow flex items-center gap-2">
+          <input 
+  type="text" 
+  name="q" 
+  placeholder="{{ section.settings.placeholder }}" 
+  class="w-full bg-transparent text-left focus:outline-none text-sm text-gray-600 placeholder-gray-400"
+/>
+          <button type="submit">
+            <svg class="w-5 h-5 text-black hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- Benefits -->
+      <div class="hidden lg:flex items-center justify-end flex-grow gap-16 xl:gap-20 px-6">
+        {% for block in section.blocks %}
+          <div class="flex items-center text-white text-[11px] xl:text-xs font-sans gap-4 cursor-pointer uppercase tracking-wider whitespace-nowrap" {{ block.shopify_attributes }}>
+            {{ block.settings.benefit_text }}
+          </div>
+        {% endfor %}
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+
+{% schema %}
+{
+  "name": "Search & Benefits Bar",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#5ab344"
+    },
+    {
+      "type": "text",
+      "id": "cat_label",
+      "label": "Category Label",
+      "default": "All Categories"
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Search Placeholder",
+      "default": "Search anything..."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefit Text",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "text",
+          "id": "benefit_text",
+          "label": "Benefit Text",
+          "default": "FREE SHIPPING OVER $199"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Search  Bar",
+      "blocks": [
+        { "type": "benefit", "settings": { "benefit_text": "FREE SHIPPING OVER $199" } },
+        { "type": "benefit", "settings": { "benefit_text": "30 DAYS MONEY BACK" } },
+        { "type": "benefit", "settings": { "benefit_text": "100% SECURE PAYMENT" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
