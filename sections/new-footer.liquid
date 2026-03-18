@@ -1,0 +1,170 @@
+<footer class="bg-white border-t border-gray-100 font-sans text-[#555555] min-h-[764px] flex flex-col pt-[100px] pb-[40px]">
+  <div class="max-w-[1410px] mx-auto px-6 w-full flex flex-col h-full flex-grow">
+    
+    <div class="flex flex-wrap lg:flex-nowrap gap-10 mb-[65px]">
+      
+      <div class="w-full lg:w-[358px] flex-shrink-0">
+        <h2 class="text-black font-inter font-bold text-[18px] mb-[45px] leading-tight tracking-tight uppercase">
+          {{ section.settings.title }}
+        </h2>
+        
+        <div class="mb-[35px]">
+          <p class="text-[11px] font-inter text-gray-400 mb-[14px] tracking-widest uppercase pt-6 ">Hotline 24/7</p>
+          <p class="text-[#2DB224] text-[34px] font-bold leading-none tracking-tighter italic pb-6">
+            {{ section.settings.phone }}
+          </p>
+        </div>
+        
+        <div class="text-[14px] leading-[1.9] mb-[40px] text-[#666666] font-normal ">
+          <p class="mb-[2px]">{{ section.settings.address_1 }}</p>
+          <p class="mb-[2px]">{{ section.settings.address_2 }}</p>
+          <p>
+            <a href="mailto:{{ section.settings.email }}" class="hover:text-[#2DB224] transition-colors pb-6">{{ section.settings.email }}</a>
+          </p>
+        </div>
+
+        <div class="flex gap-[10px] py-6">
+          {%- assign social_icons = "twitter,facebook,instagram,youtube,pinterest" | split: ',' -%}
+          {%- for social in social_icons -%}
+            {%- assign link_id = 'social_' | append: social | append: '_link' -%}
+            {%- if section.settings[link_id] != blank -%}
+              <a href="{{ section.settings[link_id] }}" class="w-[38px] h-[38px] flex items-center justify-center bg-[#F3F5F6] rounded-full text-black hover:bg-black hover:text-white transition-all duration-300">
+                {%- case social -%}
+                  {%- when 'twitter' -%}<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.84 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+                  {%- when 'facebook' -%}<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                  {%- when 'instagram' -%}<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                  {%- when 'youtube' -%}<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                  {%- when 'pinterest' -%}<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.965 1.406-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.654 2.568-.991 3.992-.283 1.194.598 2.169 1.775 2.169 2.128 0 3.765-2.244 3.765-5.482 0-2.868-2.061-4.874-5.008-4.874-3.411 0-5.413 2.561-5.413 5.199 0 1.03.397 2.133.892 2.734.098.118.112.222.083.344l-.348 1.422c-.056.23-.185.281-.427.17-1.59-.739-2.583-3.062-2.583-4.925 0-4.01 2.911-7.693 8.397-7.693 4.408 0 7.832 3.14 7.832 7.339 0 4.38-2.762 7.907-6.594 7.907-1.287 0-2.497-.669-2.911-1.458l-.793 3.021c-.287 1.096-1.063 2.469-1.583 3.311 1.132.333 2.327.512 3.56.512 6.621 0 12-5.378 12-12S18.638 0 12.017 0z"/></svg>
+                {%- endcase -%}
+              </a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 flex-grow">
+        {% for block in section.blocks %}
+          <div {{ block.shopify_attributes }}>
+            <h3 class="text-black font-bold text-[15px] mb-[45px] tracking-wider uppercase">
+              {{ block.settings.heading }}
+            </h3>
+            <ul class="space-y-[14px] text-[14px] font-normal text-[#666666]">
+              {% for link in block.settings.menu.links %}
+                <li><a href="{{ link.url }}" class="hover:text-[#2DB224] transition-colors">{{ link.title }}</a></li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row items-center justify-between py-[65px] border-t border-gray-100 mt-auto">
+      
+      <div class="flex gap-3">
+        <div class="border border-gray-200 rounded px-5 py-[11px] text-[13px] font-medium flex items-center gap-4">
+          USD <span class="text-[8px] opacity-40">▼</span>
+        </div>
+        <div class="border border-gray-200 rounded px-5 py-[11px] text-[13px] font-medium flex items-center gap-4">
+          <span class="flex items-center gap-2">
+            <span class="w-4 h-2.5 bg-red-600"></span> Eng
+          </span>
+          <span class="text-[8px] opacity-40">▼</span>
+        </div>
+      </div>
+
+      <div class="w-full lg:max-w-[780px] mt-10 lg:mt-0">
+        <h4 class="text-black font-bold mb-5 uppercase text-[15px] tracking-tight">
+          Subscribe & Get <span class="text-[#FF4E4E]">10% Off</span> For Your First Order
+        </h4>
+        <div class="relative border-b-2 border-gray-100 flex items-center pb-[12px] focus-within:border-black transition-all">
+          <input type="email" placeholder="Enter your email address" class="w-full bg-transparent outline-none text-[15px] italic text-gray-400 font-light" />
+          <button class="text-[#2DB224] font-bold text-[13px] tracking-widest uppercase ml-4">Subscribe</button>
+        </div>
+        <p class="text-[11px] text-gray-400 mt-3 italic font-light tracking-wide">
+          By subscribing, you’re accepted the our <a href="#" class="underline">Policy</a>
+        </p>
+      </div>
+    </div>
+
+    <div class="flex flex-col md:flex-row justify-between items-center py-[40px] border-t border-gray-100">
+      <div class="text-[13px] text-gray-400 font-normal">
+        © 2024 <span class="text-black font-bold uppercase tracking-tight">{{ section.settings.copyright_name }}</span>. All Rights Reserved
+      </div>
+      
+      <div class="flex items-center gap-6 grayscale opacity-80">
+        <svg class="h-4 w-auto" viewBox="0 0 32 32"><path fill="#003087" d="M12.9 5.8C12.7 4.5 11.5 3.5 10 3.5H3.1C2.8 3.5 2.5 3.7 2.4 4L.1 18.6c-.1.3.1.6.4.6h3.6l.9-5.7c.1-.5.5-.9 1-.9h2.3c3.5 0 5.6-1.7 6.1-4.8.2-1.1.1-1.6-.5-2z"/><path fill="#009CDE" d="M14 10.3c-.5 3.1-2.6 4.8-6.1 4.8H5.6l-1 6.4c0 .3.2.6.5.6h3.2c.4 0 .8-.3.9-.7l.9-5.7c.1-.5.5-.9 1-.9h.4c3.1 0 5.5-1.3 6.1-4.8.1-.6.1-1.2 0-1.7-.6 1.1-1.8 2-3.6 2z"/></svg>
+        <svg class="h-6 w-auto" viewBox="0 0 32 32"><circle fill="#EB001B" cx="12" cy="16" r="10" opacity=".8"/><circle fill="#F79E1B" cx="20" cy="16" r="10" opacity=".8"/></svg>
+        <svg class="h-4 w-auto" viewBox="0 0 32 32"><path fill="#1A1F71" d="M12.4 6.1l-2.1 11.4h3.4l2.1-11.4zM24.7 6.3c-.8-.3-2.1-.6-3.7-.6-4.1 0-7 2.2-7 5.3 0 2.3 2 3.6 3.6 4.3 1.6.8 2.2 1.3 2.2 1.9 0 1-.1 2.3-3.6 2.3-1.4 0-2.5-.4-3.8-.9l-.5-.2-.6 3.5c1 .5 2.8.9 4.7.9 4.3 0 7.1-2.1 7.1-5.4 0-1.8-1.1-3.1-3.5-4.3-1.5-.7-2.4-1.2-2.4-1.9 0-.7.7-1.4 2.3-1.4 1.3 0 2.2.3 2.9.6l.3.2.7-3.4z"/></svg>
+        <span class="text-[10px] font-black italic tracking-tighter uppercase">stripe</span>
+        <span class="text-[12px] font-bold tracking-tighter">Klarna.</span>
+      </div>
+
+      <a href="#" class="text-[#3b5998] text-[13px] font-semibold hover:underline">Mobile Site</a>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Swoo Custom Footer",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Store Name",
+      "default": "Swoo - 1st NYC Tech Online Market"
+    },
+    {
+      "type": "text",
+      "id": "phone",
+      "label": "Phone Number",
+      "default": "(025) 3686 25 16"
+    },
+    {
+      "type": "text",
+      "id": "address_1",
+      "label": "Address Line 1",
+      "default": "257 Thatcher Road St, Brooklyn, Manhattan,"
+    },
+    {
+      "type": "text",
+      "id": "address_2",
+      "label": "Address Line 2",
+      "default": "NY 10092"
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "label": "Email",
+      "default": "contact@Swootechmart.com"
+    },
+    {
+      "type": "text",
+      "id": "copyright_name",
+      "label": "Copyright Name",
+      "default": "Shawonetc3"
+    },
+    {
+      "type": "header",
+      "content": "Social Media Links"
+    },
+    { "type": "url", "id": "social_twitter_link", "label": "Twitter Link" },
+    { "type": "url", "id": "social_facebook_link", "label": "Facebook Link" },
+    { "type": "url", "id": "social_instagram_link", "label": "Instagram Link" },
+    { "type": "url", "id": "social_youtube_link", "label": "YouTube Link" },
+    { "type": "url", "id": "social_pinterest_link", "label": "Pinterest Link" }
+  ],
+  "blocks": [
+    {
+      "type": "link_list",
+      "name": "Menu Column",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "TOP CATEGORIES" },
+        { "type": "link_list", "id": "menu", "label": "Select Menu" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Swoo Custom Footer" }]
+}
+{% endschema %}
