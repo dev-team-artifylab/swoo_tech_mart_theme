@@ -21,6 +21,7 @@
   "homepage": "https://github.com/dev-team-artifylab/swoo_tech_mart_theme#readme",
   "dependencies": {
     "@tailwindcss/cli": "^4.2.1",
+    "@tailwindcss/line-clamp": "^0.4.4",
     "tailwindcss": "^4.2.1"
   },
   "devDependencies": {

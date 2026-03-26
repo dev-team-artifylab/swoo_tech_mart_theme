@@ -1,0 +1,70 @@
+{% assign collection = block.settings.collection %}
+
+{% if collection != blank %}
+
+  <div class="flex justify-between w-[163px] h-[60px] p-2">
+
+    <div>
+      <h4 class="text-sm font-bold">
+        {{ collection.title }}
+      </h4>
+
+      <p class="text-xs">
+        {{ collection.products_count }} Items
+      </p>
+    </div>
+
+    <div class="w-[50px] h-[50px]">
+
+      {% if collection.image %}
+        <img 
+          src="{{ collection.image | image_url: width: 100 }}"
+          alt="{{ collection.title }}"
+          class="w-full h-full object-fit"
+        >
+      {% else %}
+        <p>Image</p>
+      {% endif %}
+
+    </div>
+
+  </div>
+
+{% endif %}
+{% schema %}
+{
+  "name": "Category Showcase",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Top Categories"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category_block",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Select Collection"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "Category Showcase",
+      "blocks": [
+        { "type": "category_block" },
+        { "type": "category_block" },
+        { "type": "category_block" }
+      ]
+    }
+  ]
+}
+{% endschema %}
