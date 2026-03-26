@@ -2,85 +2,98 @@
   <div class="max-w-[1440px] mx-auto px-4">
     
     <div class="flex items-center justify-between bg-[#24D125] text-white px-6 py-3 rounded-t-xl">
-      <h2 class="font-bold uppercase tracking-tight">{{ section.settings.title }}</h2>
-      <a href="{{ section.settings.view_all_link }}" class="text-sm hover:underline">View All</a>
+      <h2 class="font-bold uppercase tracking-tight m-0 text-white">{{ section.settings.title }}</h2>
+      <a href="{{ section.settings.view_all_link | default: '#' }}" class="text-sm text-white hover:underline">View All</a>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 border-x border-b border-gray-100 rounded-b-xl overflow-hidden bg-white">
+    <div class="grid grid-cols-1 lg:grid-cols-12 border-x border-b border-gray-100 rounded-b-xl overflow-hidden bg-white">
       
-      <div class="lg:col-span-9 p-8 flex flex-col md:flex-row gap-8 relative">
+      {%- assign main_product = section.settings.main_deal_product -%}
+      <div class="lg:col-span-9 p-8 flex flex-col md:flex-row gap-8 relative border-r border-gray-100">
         
         <div class="hidden md:flex flex-col gap-3">
-          {% for i in (1..4) %}
-            <div class="w-12 h-16 border border-gray-100 rounded overflow-hidden cursor-pointer hover:border-green-500">
-              <img src="https://via.placeholder.com/100x150" class="object-cover w-full h-full">
-            </div>
-          {% endfor %}
+          {%- if main_product != blank -%}
+            {%- for image in main_product.images limit: 4 -%}
+              <div class="w-14 h-18 border border-gray-100 rounded overflow-hidden">
+                <img src="{{ image | image_url: width: 150 }}" class="object-cover w-full h-full" alt="{{ image.alt }}">
+              </div>
+            {%- endfor -%}
+          {%- else -%}
+            {%- for i in (1..4) -%}
+              <div class="w-14 h-18 border border-gray-100 rounded bg-gray-50 flex items-center justify-center">
+                {{ 'image' | placeholder_svg_tag: 'w-6 h-6 opacity-20' }}
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
         </div>
 
         <div class="flex-1 relative flex justify-center items-center">
-          <div class="absolute top-0 left-0 bg-[#24D125] text-white px-3 py-1 rounded-md text-sm font-bold">
-            SAVE <br> $199.00
+          <div class="absolute top-0 left-0 bg-[#24D125] text-white px-3 py-1 rounded-md text-[12px] font-bold text-center z-10">
+            SAVE <br> 
+            {%- if main_product.compare_at_price > main_product.price -%}
+               {{ main_product.compare_at_price | minus: main_product.price | money_without_trailing_zeros }}
+            {%- else -%}
+               $199.00
+            {%- endif -%}
           </div>
-          <img src="https://via.placeholder.com/400x500" class="max-h-[400px] object-contain">
+          {%- if main_product != blank -%}
+            <img src="{{ main_product.featured_image | image_url: width: 800 }}" class="max-h-[400px] object-contain" alt="{{ main_product.title }}">
+          {%- else -%}
+            {{ 'product-1' | placeholder_svg_tag: 'w-full h-[350px] bg-gray-50' }}
+          {%- endif -%}
         </div>
 
         <div class="flex-1">
-          <div class="text-gray-400 text-sm mb-1">(12)</div>
+          <p class="text-gray-400 text-sm mb-1">(12)</p>
           <h3 class="text-xl font-bold text-gray-900 mb-4 leading-tight">
-            Xioma Redmi Note 11 Pro 256GB 2023, Black Smartphone
+            {{ main_product.title | default: "Xioma Redmi Note 11 Pro 256GB 2023, Black Smartphone" }}
           </h3>
 
-          <div class="flex items-center gap-3 mb-4">
-            <span class="text-2xl font-bold text-[#E52E2E]">$569.00</span>
-            <span class="text-gray-400 line-through">$759.00</span>
+          <div class="flex items-center gap-3 mb-6 py-4">
+            <span class="text-3xl font-bold text-[#E52E2E]">{{ main_product.price | money | default: "$569.00" }}</span>
+            <span class="text-gray-400 line-through text-lg">{{ main_product.compare_at_price | money | default: "$759.00" }}</span>
           </div>
 
-          <ul class="text-xs text-gray-600 space-y-2 mb-6">
-            <li class="flex items-start gap-2">• Intel LGA 1700 Socket: Supports 13th & 12th Gen Intel Core</li>
-            <li class="flex items-start gap-2">• DDR5 Compatible: 4*SMD DIMMs with XMP 3.0 Memory</li>
-            <li class="flex items-start gap-2">• Commanding Power Design: Twin 16+1+2 Phases Digital VRM</li>
-          </ul>
-
-          <div class="flex gap-2 mb-8">
-            <span class="bg-green-50 text-green-600 text-[10px] px-2 py-1 font-bold rounded">FREE SHIPPING</span>
-            <span class="bg-red-50 text-red-500 text-[10px] px-2 py-1 font-bold rounded">FREE GIFT</span>
+          <div class="text-sm text-gray-600 mb-6 py-4">
+            {{ section.settings.specs_richtext | default: "<ul><li>• Intel LGA 1700 Socket</li><li>• DDR5 Compatible</li><li>• Twin 16+1+2 Phases</li></ul>" }}
           </div>
 
-          <div class="flex items-center gap-4 mb-6">
-            <p class="text-[10px] font-bold uppercase leading-tight text-gray-700">Hurry Up!<br>Promotion will<br>expires in</p>
-            <div class="flex gap-1">
-              {% render 'countdown-box', number: '-162', label: 'd' %}
-              {% render 'countdown-box', number: '9', label: 'h' %}
-              {% render 'countdown-box', number: '32', label: 'm' %}
-              {% render 'countdown-box', number: '34', label: 's' %}
-            </div>
+          <div class="flex items-center gap-4 mb-6 py-4">
+             <div class="text-[10px] font-bold uppercase leading-tight text-gray-700">Hurry Up!<br>Expires In</div>
+             <div class="flex gap-1">
+                <div class="ct-box"><span>162</span><small>D</small></div>
+                <div class="ct-box"><span>09</span><small>H</small></div>
+                <div class="ct-box"><span>32</span><small>M</small></div>
+                <div class="ct-box"><span>34</span><small>S</small></div>
+             </div>
           </div>
 
-          <div class="space-y-2">
+          <div class="space-y-2 py-4">
             <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-              <div class="bg-[#24D125] h-full" style="width: 35%;"></div>
+              <div class="bg-[#24D125] h-full" style="width: {{ section.settings.progress_bar }}%;"></div>
             </div>
-            <p class="text-xs text-gray-500">Sold: <span class="font-bold text-black">26/75</span></p>
+            <p class="text-xs text-gray-500 font-medium">Sold: <span class="font-bold text-black">{{ section.settings.sold_text }}</span></p>
           </div>
         </div>
       </div>
 
-      <div class="lg:col-span-3 p-4 bg-gray-50 flex flex-col gap-4">
-        {% for block in section.blocks %}
-          {% if block.type == 'banner' %}
-            <div class="rounded-xl overflow-hidden h-1/3">
-              <img src="{{ block.settings.image | image_url }}" class="w-full h-full object-cover">
-            </div>
-          {% endif %}
-        {% endfor %}
+      <div class="lg:col-span-3 p-4 bg-[#F7F7F7] flex flex-col gap-4">
+        {%- for block in section.blocks -%}
+          <div class="rounded-xl overflow-hidden flex-1 min-h-[160px] bg-white border border-gray-100" {{ block.shopify_attributes }}>
+            {%- if block.settings.banner_image != blank -%}
+              <img src="{{ block.settings.banner_image | image_url: width: 500 }}" class="w-full h-full object-cover transition duration-500 hover:scale-110">
+            {%- else -%}
+              {{ 'collection-1' | placeholder_svg_tag: 'w-full h-full opacity-10' }}
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
       </div>
     </div>
 
     <div class="mt-6 bg-[#18C41A] rounded-2xl p-6 flex items-center justify-center text-center text-white relative overflow-hidden">
        <div class="relative z-10 flex items-center gap-2 flex-wrap justify-center">
          <span>🌟 Member get <strong class="text-yellow-300">FREE SHIPPING*</strong> with no order minimum!. *Restriction apply</span>
-         <a href="#" class="underline font-bold">Try free 30-days trial!</a>
+         <a href="#" class="underline font-bold ml-2">Try free 30-days trial!</a>
        </div>
        <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10"></div>
     </div>
@@ -89,26 +102,41 @@
 </section>
 
 <style>
-  .countdown-box {
-    @apply bg-gray-100 rounded-md p-2 min-w-[45px] text-center;
+  .ct-box {
+    background: #F3F4F6;
+    border-radius: 6px;
+    min-width: 46px;
+    padding: 6px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
   }
+  .ct-box span { font-weight: 800; font-size: 16px; color: #111827; line-height: 1.2; }
+  .ct-box small { font-size: 10px; color: #9CA3AF; text-transform: uppercase; font-weight: 600; }
 </style>
-
 
 {% schema %}
 {
   "name": "Deals of the Day",
   "settings": [
     { "type": "text", "id": "title", "label": "Heading", "default": "Deals of the Day" },
-    { "type": "url", "id": "view_all_link", "label": "View All Link" }
+    { "type": "url", "id": "view_all_link", "label": "View All Link" },
+    { "type": "product", "id": "main_deal_product", "label": "Product for Deal" },
+    { "type": "richtext", "id": "specs_richtext", "label": "Specifications", "default": "<p>• Intel LGA 1700 Socket</p><p>• DDR5 Compatible</p>" },
+    { "type": "range", "id": "progress_bar", "label": "Sold Progress (%)", "min": 0, "max": 100, "default": 35 },
+    { "type": "text", "id": "sold_text", "label": "Sold Count Label", "default": "26/75" }
   ],
   "blocks": [
     {
       "type": "banner",
-      "name": "Sidebar Banner",
+      "name": "Right Sidebar Banner",
       "limit": 3,
       "settings": [
-        { "type": "image_picker", "id": "image", "label": "Banner Image" }
+        {
+          "type": "image_picker",
+          "id": "banner_image",
+          "label": "Promo Image"
+        }
       ]
     }
   ],
