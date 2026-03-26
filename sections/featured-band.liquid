@@ -1,0 +1,171 @@
+<section class="w-full py-16 bg-white">
+  <div class="max-w-[1440px] mx-auto px-4">
+
+    <div class="grid grid-cols-1 lg:grid-cols-2  rounded-lg shadow-sm">
+
+      <div class="p-8 ">
+
+        <div class="flex items-center justify-between mb-10">
+          <h2 class="text-[17px] font-bold uppercase tracking-wide text-[#1A1A1A]">
+            {{ section.settings.brands_title }}
+          </h2>
+
+          <a href="{{ section.settings.brands_link }}" 
+             class="text-sm font-medium text-[#7A7A7A] hover:text-[#28A745] transition">
+            View All
+          </a>
+        </div>
+
+        <div class="grid grid-cols-4 gap-x-6 gap-y-12 items-center py-6">
+          {% for block in section.blocks %}
+            {% if block.type == 'brand' %}
+              <div class="flex items-center justify-center h-full">
+                {% if block.settings.logo %}
+                  {{ block.settings.logo | image_url: width: 240 | image_tag: 
+                    loading: 'lazy', 
+                    class: 'h-[35px] w-[97px] object-contain max-w-full opacity-90 hover:opacity-100 transition' 
+                  }}
+                {% else %}
+                    {{ 'logo' | placeholder_svg_tag: 'h-7 w-auto' }}
+                {% endif %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+      </div>
+
+
+      <div class="p-8 py-6">
+
+        <div class="flex items-center justify-between mb-10">
+
+          <h2 class="text-[17px] font-bold uppercase tracking-wide text-[#1A1A1A]">
+            {{ section.settings.categories_title }}
+          </h2>
+
+          <div class="flex items-center gap-6">
+
+            <a href="{{ section.settings.categories_link }}" 
+               class="text-sm font-medium text-[#7A7A7A] hover:text-[#28A745] transition">
+              View All
+            </a>
+
+            <div class="flex items-center bg-[#F3F3F3] rounded-full px-4 py-2 gap-4 text-[#7A7A7A]">
+              <button class="hover:text-[#1A1A1A] transition disabled:opacity-40">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+              <button class="hover:text-[#1A1A1A] transition disabled:opacity-40">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="grid grid-cols-4 gap-x-6 items-end text-center py-6">
+
+          {% for block in section.blocks %}
+            {% if block.type == 'category' %}
+              <a href="{{ block.settings.link | default: '#' }}" class="group flex flex-col items-center">
+
+  {% if block.settings.image %}
+    {{ block.settings.image | image_url: width: 300 | image_tag: 
+      loading: 'lazy', 
+      class: 'h-[60px] w-[113px] object-contain mb-2 group-hover:-translate-y-1.5 transition-transform' 
+    }}
+  {% else %}
+    <div class="h-24 flex items-center justify-center mb-2">
+      {{ 'product-1' | placeholder_svg_tag: 'h-16 w-16 opacity-50' }}
+    </div>
+  {% endif %}
+
+  <p class="text-sm font-semibold text-[#1A1A1A] group-hover:text-[#28A745] transition text-center">
+    {{ block.settings.title }}
+  </p>
+
+</a>
+            {% endif %}
+          {% endfor %}
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+
+
+{% schema %}
+{
+  "name": "Brands + Categories",
+  "settings": [
+    {
+      "type": "text",
+      "id": "brands_title",
+      "label": "Brands Title",
+      "default": "Featured Brands"
+    },
+    {
+      "type": "url",
+      "id": "brands_link",
+      "label": "Brands View All Link"
+    },
+    {
+      "type": "text",
+      "id": "categories_title",
+      "label": "Categories Title",
+      "default": "Top Categories"
+    },
+    {
+      "type": "url",
+      "id": "categories_link",
+      "label": "Categories View All Link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "brand",
+      "name": "Brand",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Brand Logo (Prefer Transparent PNG)"
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Category Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Category Name",
+          "default": "Category"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Category Link"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 24,
+  "presets": [
+    {
+      "name": "Brands + Categories"
+    }
+  ]
+}
+{% endschema %}
