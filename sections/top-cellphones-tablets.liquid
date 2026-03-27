@@ -1,69 +1,16 @@
-<section class="bg-gray-200 max-w-[1240px] max-h-[257px]">
-  <!-- Header -->
-  <div class="flex justify-between items-center py-4 px-4">
-    <h2 class="text-l font-semibold">
-      {{ section.settings.heading }}
-    </h2>
+{% assign collection = collections[section.settings.product_collection] %}
 
-    <div class="text-xs">
-      <a href="{{ section.settings.view_all_link }}">
-        {{ section.settings.view_all_text }}
-      </a>
-    </div>
-  </div>
+{%  render 'slider-collection-mix' %}
 
-  <div class="flex flex-row gap-4">
-    <div class="slider px-4">
-      <div
-        class="relative h-[200px] md:w-[450px] lg:w-[605px] rounded-lg overflow-hidden bg-cover bg-center flex items-center"
 
-        {% if section.settings.banner_image %}
-          style="background-image: url('{{ section.settings.banner_image | image_url: width: 1200 }}');"
-        {% endif %}
-      >
 
-        <!-- Content -->
-        <div class="relative z-10 text-white px-6 max-w-[60%] flex flex-col gap-2">
-          <h2 class="text-lg md:text-xl lg:text-2xl font-bold max-w-[160px] leading-tight">
-            {{ section.settings.banner_heading }}
-          </h2>
-
-          <p class="text-xs mt-1 opacity-90">
-            {{ section.settings.banner_subtext }}
-          </p>
-
-          <a
-            href="{{ section.settings.banner_button_link }}"
-            class="inline-block mt-3 px-4 py-2 bg-black text-white text-xs rounded-md w-[102px] h-[32px]"
-          >
-            {{ section.settings.banner_button_text }}
-          </a>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- Categories -->
-    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8 py-2">
-      {% if section.blocks.size == 0 %}
-        <div class="col-span-full flex items-center justify-center min-h-[200px]">
-          <p class="text-sm text-gray-500">Add collections to display categories</p>
-        </div>
-      {% endif %}
-
-      {% for block in section.blocks %}
-        {% render 'collection-snp', block: block %}
-      {% endfor %}
-    </div>
-  </div>
-</section>
-<section>
-  <!-- Show Tablet, Mobile Collection Here -->
-</section>
+{% for product in collection.products limit: section.settings.products_to_show %}
+  {% render 'product-card', product: product %}
+{% endfor %}
 
 {% schema %}
 {
-  "name": "Category Showcase",
+  "name": "Category,Product Showcase",
   "settings": [
     {
       "type": "text",
@@ -83,7 +30,7 @@
       "label": "View All Link"
     },
 
-    /* Banner Settings */
+    /* Banner */
     {
       "type": "image_picker",
       "id": "banner_image",
@@ -111,6 +58,22 @@
       "type": "url",
       "id": "banner_button_link",
       "label": "Button Link"
+    },
+
+    /* Product Showcase */
+    {
+      "type": "collection",
+      "id": "product_collection",
+      "label": "Select Product Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Number of products",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 4
     }
   ],
 
@@ -143,12 +106,7 @@
 
   "presets": [
     {
-      "name": "Category Showcase",
-      "blocks": [
-        { "type": "category_block" },
-        { "type": "category_block" },
-        { "type": "category_block" }
-      ]
+      "name": "Category,Product Showcase"
     }
   ]
 }
