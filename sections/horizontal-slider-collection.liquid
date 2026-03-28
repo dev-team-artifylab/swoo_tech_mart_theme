@@ -1,0 +1,117 @@
+<section class="w-[1300px] h-auto bg-green-200">
+  <div class="max-w-[428px] h-[742px] px-4">
+    
+    <!-- Header -->
+    <div class="max-w-[368px] flex justify-between items-center py-4">
+      <h2 class="text-lg font-semibold">
+        {{ section.settings.title }}
+      </h2>
+
+      <div class="text-xs">
+       
+        <a href="{{ routes.collections_url }}">View All</a>
+      
+      </div>
+    </div>
+
+    <!-- Banner -->
+    <div class="max-w-[368px] h-[190px] flex items-center justify-center overflow-hidden">
+      {% if section.settings.cover_image != blank %}
+        <img 
+          src="{{ section.settings.cover_image | image_url: width: 800 }}" 
+          alt="Cover"
+          class="w-full h-full object-cover"
+        >
+      {% else %}
+        <p>This will be an image upload option</p>
+      {% endif %}
+    </div>
+
+    <!-- Divider -->
+    <div class="max-w-[368px] py-4">
+      <hr class="my-4 border-gray-200">
+    </div>
+
+    <!-- Grid -->
+    <div class="max-w-[368px] h-[410px] grid grid-cols-2 grid-rows-2 gap-6">
+
+      {% for block in section.blocks %}
+        {% assign collection = block.settings.collection %}
+        
+        <div class="flex flex-col items-center p-2">
+          
+          <a href="{{ collection.url }}">
+            <div class="flex justify-center items-center w-[120px] h-[120px] rounded-full overflow-hidden bg-gray-200 border">
+              
+              {% if collection.featured_image %}
+                <img 
+                  src="{{ collection.featured_image | image_url: width: 300 }}" 
+                  alt="{{ collection.title }}"
+                  class="w-full h-full object-cover"
+                >
+              {% else %}
+                <p>Image</p>
+              {% endif %}
+              
+            </div>
+          </a>
+
+          <h3 class="text-sm mt-2 text-center">
+            {{ collection.title }}
+          </h3>
+
+          <p class="text-xs text-gray-500">
+            {{ collection.products_count }} Items
+          </p>
+
+        </div>
+
+      {% endfor %}
+
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Collection Section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Audios & Cameras"
+    },
+    {
+      "type": "image_picker",
+      "id": "cover_image",
+      "label": "Cover Image"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection_block",
+      "name": "Collection Item",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Select Collection"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "presets": [
+    {
+      "name": "Eid Collection Section",
+      "blocks": [
+        { "type": "collection_block" },
+        { "type": "collection_block" },
+        { "type": "collection_block" },
+        { "type": "collection_block" }
+      ]
+    }
+  ]
+}
+{% endschema %}

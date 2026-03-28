@@ -1,0 +1,122 @@
+<div class="flex flex-row px-3">
+  {% for block in section.blocks %}
+    {% assign banner = block.settings.category_banner %}
+    {% assign col1 = block.settings.collection_1 %}
+    {% assign col2 = block.settings.collection_2 %}
+    {% assign col3 = block.settings.collection_3 %}
+    {% assign col4 = block.settings.collection_4 %}
+
+    <!-- Slide -->
+    <div class="flex-none max-w-[428px] snap-start py-2" {{ block.shopify_attributes }}>
+      <!-- Header -->
+      <div class="flex justify-between items-center py-4 px-4">
+        <h2 class="text-lg font-semibold">{{ block.settings.title }}</h2>
+        <div class="text-xs">
+          <a href="{{ routes.collections_url }}">View All</a>
+        </div>
+      </div>
+
+      <!-- Banner -->
+      <div class="px-4 h-[190px] flex items-center justify-center overflow-hidden rounded-lg">
+        {% if banner != blank %}
+          <img
+            src="{{ banner | image_url: width: 800 }}"
+            alt="Category Banner"
+            class="w-full h-full object-cover"
+          >
+        {% else %}
+          <p class="text-sm text-gray-400">Upload a category banner image</p>
+        {% endif %}
+      </div>
+
+      <!-- Divider -->
+      <div class="max-w-[428px] px-4 py-4"><hr class="my-4 border-gray-200"></div>
+
+      <!-- 2x2 Collection Grid -->
+      <div class="px-4 grid grid-cols-2 grid-rows-2 gap-6 h-[410px]">
+        {% for i in (1..4) %}
+          {% if i == 1 %}{% assign col = col1 %}{% endif %}
+          {% if i == 2 %}{% assign col = col2 %}{% endif %}
+          {% if i == 3 %}{% assign col = col3 %}{% endif %}
+          {% if i == 4 %}{% assign col = col4 %}{% endif %}
+
+          {% if col != blank %}
+            <div class="flex flex-col items-center p-2">
+              <a href="{{ col.url }}">
+                <div class="flex justify-center items-center w-[120px] h-[120px] rounded-full overflow-hidden bg-gray-200 border">
+                  {% if col.featured_image %}
+                    <img
+                      src="{{ col.featured_image | image_url: width: 300 }}"
+                      alt="{{ col.title }}"
+                      class="w-full h-full object-cover"
+                    >
+                  {% else %}
+                    <p>Image</p>
+                  {% endif %}
+                </div>
+              </a>
+              <h3 class="text-sm mt-2 text-center">{{ col.title }}</h3>
+              <p class="text-xs text-gray-500">{{ col.products_count }} Items</p>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "Product Collection",
+  "settings": [],
+
+  "max_blocks": 3,
+
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Section Title",
+          "default": "Shop by Category"
+        },
+        {
+          "type": "image_picker",
+          "id": "category_banner",
+          "label": "Category Banner"
+        },
+        {
+          "type": "collection",
+          "id": "collection_1",
+          "label": "Category 1"
+        },
+        {
+          "type": "collection",
+          "id": "collection_2",
+          "label": "Category 2"
+        },
+        {
+          "type": "collection",
+          "id": "collection_3",
+          "label": "Category 3"
+        },
+        {
+          "type": "collection",
+          "id": "collection_4",
+          "label": "Category 4"
+        }
+      ]
+    }
+  ],
+
+  "presets": [
+    {
+      "name": "Product Collection",
+      "category": "Content"
+    }
+  ]
+}
+{% endschema %}

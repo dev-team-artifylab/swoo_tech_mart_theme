@@ -3,14 +3,11 @@
 {%  render 'slider-collection-mix' %}
 
 <div class="max-w-[1240px] mx-auto px-4">
-
- 
   <p class="py-2"> <hr class="border-t border-gray-200"></p>
- 
 </div>
 
 {% for product in collection.products limit: section.settings.products_to_show %}
-  {% render 'product-card', product: product %}
+  {% render 'product-card', product: product %}  
 {% endfor %}
 
 {% schema %}
