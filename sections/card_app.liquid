@@ -1,0 +1,72 @@
+{% schema %}
+{
+    "name": "Card Section",
+    "settings": [
+        {
+            "type": "image_picker",
+            "id": "card_image",
+            "label": "Card Image"
+        },
+        {
+            "type": "text",
+            "id": "card_title",
+            "label": "Card Title",
+            "default": "10% Back"
+        },
+        {
+            "type": "text",
+            "id": "card_description",
+            "label": "Card Description",
+            "default": "Earn 10% Cash back on Swootech. Learn How"
+        },
+        {
+            "type": "image_picker",
+            "id": "card_image_2",
+            "label": "Card Image 2"
+        },
+        {
+            "type": "text",
+            "id": "card_title_2",
+            "label": "Card Title 2",
+            "default": "Download our app"
+        },
+        {
+            "type": "text",
+            "id": "card_description_2",
+            "label": "Card Description 2",
+            "default": "Earn 10% Cash back on Swootech. Learn How"
+        }
+    ],
+
+    "blocks": [
+         
+    ],
+
+    "presets": [
+        {
+            "name": "Card Section"
+        }
+    ]
+}
+{% endschema %}
+
+<section class="w-full h-[200px] flex justify-center items-center gap-4">
+   
+        <div class="w-[646px] h-[180px] bg-red-400 rounded-xl flex relative">
+            {{ section.settings.card_image | image_url: width: 646 | image_tag: class: 'w-full h-full object-cover rounded-xl' }}
+            <h1 class="text-[40px] font-bold absolute top-10 right-20 text-[#FFE400]">{{ section.settings.card_title }}</h1>
+            <p class="text-[12px] text-white font-semibold absolute top-25 right-24 w-[155px]">{{ section.settings.card_description }}</p>
+        </div>
+        <div class="w-[646px] h-[180px] bg-red-400 rounded-xl relative">
+            {{ section.settings.card_image_2 | image_url: width: 646 | image_tag: class: 'w-full h-full object-cover rounded-xl' }}
+            <div class="absolute top-10 left-12 text-white flex gap-6 ">
+                <h1 class="text-[24px] font-bold w-[150px]">{{ section.settings.card_title_2 }}</h1>
+                <p class="text-[12px] w-[196px] text-white font-semibold pt-8 opacity-70">{{ section.settings.card_description_2 }}</p>
+            </div>
+            <div class="absolute top-32 left-12 bg-[#999999] pl-4 pr-4 w-[300px] h-[35px] rounded-xl flex">
+                <input type="text" placeholder="(+xx) xxx..." class="bg-transparent border-none outline-none text-white w-[210px]">
+                <button class="text-[#1BF11B] text-[12px]">send link</button>
+            </div>
+        </div>
+    
+</section>
