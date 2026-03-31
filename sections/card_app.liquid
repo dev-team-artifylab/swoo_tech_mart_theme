@@ -52,12 +52,12 @@
 
 <section class="w-full h-[200px] flex justify-center items-center gap-4">
    
-        <div class="w-[646px] h-[180px] bg-red-400 rounded-xl flex relative">
+        <div class="w-[646px] h-[180px] rounded-xl flex relative">
             {{ section.settings.card_image | image_url: width: 646 | image_tag: class: 'w-full h-full object-cover rounded-xl' }}
             <h1 class="text-[40px] font-bold absolute top-10 right-20 text-[#FFE400]">{{ section.settings.card_title }}</h1>
             <p class="text-[12px] text-white font-semibold absolute top-25 right-24 w-[155px]">{{ section.settings.card_description }}</p>
         </div>
-        <div class="w-[646px] h-[180px] bg-red-400 rounded-xl relative">
+        <div class="w-[646px] h-[180px] rounded-xl relative">
             {{ section.settings.card_image_2 | image_url: width: 646 | image_tag: class: 'w-full h-full object-cover rounded-xl' }}
             <div class="absolute top-10 left-12 text-white flex gap-6 ">
                 <h1 class="text-[24px] font-bold w-[150px]">{{ section.settings.card_title_2 }}</h1>
