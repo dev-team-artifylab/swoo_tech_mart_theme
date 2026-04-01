@@ -1,0 +1,188 @@
+<section class="w-full py-12 bg-white" data-section-id="{{ section.id }}">
+  <div class="max-w-[1440px] mx-auto px-4">
+    
+    <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-gray-100 mb-8 gap-4">
+      <div class="flex gap-8 overflow-x-auto no-scrollbar">
+        {%- if section.settings.collection_1 != blank -%}
+          <button class="tab-trigger active text-lg font-bold uppercase border-b-2 border-black pb-2 whitespace-nowrap" data-tab="tab-1">
+            {{ section.settings.title_1 | default: section.settings.collection_1.title }}
+          </button>
+        {%- endif -%}
+        {%- if section.settings.collection_2 != blank -%}
+          <button class="tab-trigger text-lg font-bold uppercase text-gray-400 hover:text-black transition pb-2 whitespace-nowrap" data-tab="tab-2">
+            {{ section.settings.title_2 | default: section.settings.collection_2.title }}
+          </button>
+        {%- endif -%}
+        {%- if section.settings.collection_3 != blank -%}
+          <button class="tab-trigger text-lg font-bold uppercase text-gray-400 hover:text-black transition pb-2 whitespace-nowrap" data-tab="tab-3">
+            {{ section.settings.title_3 | default: section.settings.collection_3.title }}
+          </button>
+        {%- endif -%}
+      </div>
+      <a href="{{ section.settings.collection_1.url }}" class="text-sm text-gray-500 hover:text-green-600 pb-2 transition">View All</a>
+    </div>
+
+    <div class="relative">
+      
+      {%- assign tab_collections = "collection_1,collection_2,collection_3" | split: ',' -%}
+      
+      {%- for tab_key in tab_collections -%}
+        {%- assign collection = section.settings[tab_key] -%}
+        <div id="tab-{{ forloop.index }}" class="tab-content {% unless forloop.first %}hidden{% endunless %}">
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            
+            {%- if collection != blank -%}
+              {%- for product in collection.products limit: section.settings.products_to_show -%}
+                <div class="flex flex-col group relative">
+                  <div class="relative aspect-square mb-4 flex items-center justify-center bg-[#F9F9F9] rounded-lg overflow-hidden">
+                    {%- if product.compare_at_price > product.price -%}
+                      <div class="absolute top-2 left-2 z-10">
+                        <span class="bg-[#56B846] text-white text-[10px] font-bold px-2 py-1 rounded">
+                          SAVE {{ product.compare_at_price | minus: product.price | money_without_trailing_zeros }}
+                        </span>
+                      </div>
+                    {%- endif -%}
+                    
+                    <img src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title }}" class="object-contain w-4/5 h-4/5 group-hover:scale-105 transition duration-500">
+                  </div>
+
+                  <div class="space-y-1">
+                    <p class="text-[11px] text-gray-400 text-center">(152)</p>
+                    <h3 class="text-sm font-bold text-gray-900 leading-tight h-10 line-clamp-2">
+                      <a href="{{ product.url }}">{{ product.title }}</a>
+                    </h3>
+                    
+                    <div class="flex items-center gap-2 pt-2">
+                      <span class="text-lg font-bold text-black">{{ product.price | money }}</span>
+                      {%- if product.compare_at_price > product.price -%}
+                        <span class="text-sm text-gray-400 line-through">{{ product.compare_at_price | money }}</span>
+                      {%- endif -%}
+                    </div>
+
+                    <div class="flex flex-wrap gap-1 pt-2">
+                      <span class="bg-green-50 text-[#56B846] text-[9px] font-bold px-2 py-0.5 rounded uppercase">Free Shipping</span>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 pt-3">
+                      {% if product.available %}
+                        <div class="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#56B846" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <span class="text-[11px] font-medium text-gray-600">In stock</span>
+                      {% else %}
+                        <span class="text-[11px] font-medium text-red-500">Out of stock</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              {%- endfor -%}
+            {%- else -%}
+              {%- comment -%} Placeholder cards if no collection selected {%- endcomment -%}
+              {% for i in (1..5) %}
+                <div class="opacity-40">{{ 'product-' | append: i | placeholder_svg_tag: 'w-full h-full border' }}</div>
+              {% endfor %}
+            {%- endif -%}
+
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .tab-trigger.active { border-color: black; color: black; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+
+<script>
+  document.querySelectorAll('.tab-trigger').forEach(trigger => {
+    trigger.addEventListener('click', function() {
+      const target = this.getAttribute('data-tab');
+      const section = this.closest('section');
+      
+      // Update Button UI
+      section.querySelectorAll('.tab-trigger').forEach(btn => {
+        btn.classList.remove('active', 'border-black');
+        btn.classList.add('text-gray-400');
+      });
+      this.classList.add('active', 'border-black');
+      this.classList.remove('text-gray-400');
+
+      // Switch Content
+      section.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+      });
+      section.querySelector(`#${target}`).classList.remove('hidden');
+    });
+  });
+</script>
+
+
+{% schema %}
+{
+  "name": "Tabbed Product Grid",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Tab 1 Settings"
+    },
+    {
+      "type": "text",
+      "id": "title_1",
+      "label": "Tab 1 Label",
+      "default": "Best Seller"
+    },
+    {
+      "type": "collection",
+      "id": "collection_1",
+      "label": "Collection 1"
+    },
+    {
+      "type": "header",
+      "content": "Tab 2 Settings"
+    },
+    {
+      "type": "text",
+      "id": "title_2",
+      "label": "Tab 2 Label",
+      "default": "New In"
+    },
+    {
+      "type": "collection",
+      "id": "collection_2",
+      "label": "Collection 2"
+    },
+    {
+      "type": "header",
+      "content": "Tab 3 Settings"
+    },
+    {
+      "type": "text",
+      "id": "title_3",
+      "label": "Tab 3 Label",
+      "default": "Popular"
+    },
+    {
+      "type": "collection",
+      "id": "collection_3",
+      "label": "Collection 3"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "default": 5,
+      "label": "Products per tab"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Tabbed Product Grid"
+    }
+  ]
+}
+{% endschema %}

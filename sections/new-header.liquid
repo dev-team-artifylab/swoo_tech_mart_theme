@@ -49,9 +49,9 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="hidden lg:flex space-x-8 font-sans text-sm gap-4">
+    <nav class="hidden lg:flex justify-start items-center font-sans text-sm gap-4 w-full pl-[200px]">
       {% for link in linklists[section.settings.main_menu].links %}
-        <a href="{{ link.url }}" class="flex items-center hover:text-green-600 uppercase">
+       <a href="{{ link.url }}" class="flex items-center hover:text-green-600 uppercase ">
           {{ link.title }}
           {% if link.links.size > 0 %}
             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
