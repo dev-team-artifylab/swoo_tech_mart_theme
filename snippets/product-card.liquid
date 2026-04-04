@@ -1,0 +1,47 @@
+<section class="max-w-[1240px] px-4 mx-auto pt-4">
+  
+  {% assign collection = collections[section.settings.product_collection] %}
+
+  <div class="flex gap-2">
+
+    {% for product in collection.products limit: section.settings.products_to_show %}
+
+      <div class="w-[224px] h-[425px] bg-white shadow rounded-lg p-3">
+
+        <!-- Product Image -->
+        <div class="w-full h-[200px] flex items-center justify-center">
+          <img 
+            src="{{ product.featured_image | image_url: width: 300 }}" 
+            alt="{{ product.title }}"
+            class="object-contain h-full"
+          >
+        </div>
+
+        <!-- Product Info -->
+        <p class="text-sm text-gray-500 mt-2 flex justify-center">
+          ({{ product.variants.size }})
+        </p>
+
+        <h3 class="text-sm font-semibold line-clamp-2">
+          {{ product.title }}
+        </h3>
+
+        <!-- Price -->
+        <p class="text-lg font-bold text-red-500 mt-1">
+          {{ product.price | money }}
+        </p>
+
+        <!-- Stock -->
+        {% if product.available %}
+          <p class="text-green-600 text-sm mt-1">In stock</p>
+        {% else %}
+          <p class="text-red-500 text-sm mt-1">Out of stock</p>
+        {% endif %}
+
+      </div>
+
+    {% endfor %}
+
+  </div>
+
+</section>

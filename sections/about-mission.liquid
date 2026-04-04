@@ -1,0 +1,68 @@
+{% schema %}
+{
+    "name": "About Mission",
+    "settings": [
+        {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+        }
+    ],
+    "blocks": [
+        {
+            "type": "timeline_item",
+            "name": "Timeline Item",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "year",
+                    "label": "Year",
+                    "default": "1997"
+                },
+                {
+                    "type": "text",
+                    "id": "text",
+                    "label": "Text",
+                    "default": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod."
+                }
+            ]
+        }
+    ],
+    "presets": [
+        {
+            "name": "About Mission",
+            "blocks": [
+                {
+                    "type": "timeline_item"
+                }
+            ]
+        }
+    ]
+}
+{% endschema %}
+
+<section class="gap-[30px] flex flex-col">
+    <h1 class="font-bold text-[18px]">OUR MISSION AND VISION</h1>
+    <p class="text-[14px]">Nam maximus nunc a augue pulvinar, non euismod mauris tempus. Cras non elit vel magna molestie pellentesque in eu dui. Donec laoreet quis erat vitae finibus. Vestibulum enim eros, porta eget
+quam et, euismod dictum elit. Nullam eu tempus magna. Fusce malesuada nisi id felis placerat porta vel sed augue. Vivamus mollis mauris vitae rhoncus egestas. Pellentesque habitant morbi
+tristique senectus et netus et malesuada fames ac turpis egestas.</p>
+
+    {% if section.settings.image != blank %}
+        {{ section.settings.image | image_url: width: 1600 | image_tag: class: 'w-[1300px] h-[400px] object-cover rounded-xl' }}
+    {% else %}
+        <h3 class="text-center">Upload an image</h3>
+    {% endif %}
+
+    <h1 class="font-bold text-[18px]">from a retail store to the global chain of stores</h1>
+    <p class="text-[14px]">Pellentesque laoreet justo nec ex sodales euismod. Aliquam orci tortor, bibendum nec ultricies ac, auctor nec purus. Maecenas in consectetur erat.</p>
+
+    <div class="flex flex-col gap-2 mt-6">
+        {% for block in section.blocks %}
+            <div class="flex" {{ block.shopify_attributes }}>
+                <h1 class="font-bold">{{ block.settings.year }} : </h1>
+                <p class="ml-2">{{ block.settings.text }}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+</section>

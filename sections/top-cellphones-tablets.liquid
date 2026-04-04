@@ -1,0 +1,115 @@
+{% assign collection = collections[section.settings.product_collection] %}
+
+{%  render 'slider-collection-mix' %}
+
+<div class="max-w-[1240px] mx-auto px-4">
+  <p class="py-2"> <hr class="border-t border-gray-200"></p>
+</div>
+
+
+  {% render 'product-card', product: product %}  
+
+
+{% schema %}
+{
+  "name": "Category,Product Showcase",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Set Name Of Category"
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "View All Text",
+      "default": "View All"
+    },
+    {
+      "type": "url",
+      "id": "view_all_link",
+      "label": "View All Link"
+    },
+
+    /* Banner */
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Banner Image"
+    },
+    {
+      "type": "text",
+      "id": "banner_heading",
+      "label": "Banner Heading",
+      "default": "REDMI NOTE 12 PRO+ 5G"
+    },
+    {
+      "type": "text",
+      "id": "banner_subtext",
+      "label": "Banner Sub Text",
+      "default": "Rise to the challenge"
+    },
+    {
+      "type": "text",
+      "id": "banner_button_text",
+      "label": "Button Text",
+      "default": "SHOP NOW"
+    },
+    {
+      "type": "url",
+      "id": "banner_button_link",
+      "label": "Button Link"
+    },
+
+    /* Product Showcase */
+    {
+      "type": "collection",
+      "id": "product_collection",
+      "label": "Select Product Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Number of products",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 5
+    }
+  ],
+
+  "blocks": [
+    {
+      "type": "category_block",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Category Title",
+          "default": "Category Name"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Select Collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Category Image"
+        }
+      ]
+    }
+  ],
+
+  "max_blocks": 6,
+
+  "presets": [
+    {
+      "name": "Category,Product Showcase"
+    }
+  ]
+}
+{% endschema %}

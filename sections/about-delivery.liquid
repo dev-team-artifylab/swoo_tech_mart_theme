@@ -1,0 +1,45 @@
+{% schema %}
+{
+    "name": "About Delivery",
+    "settings": [
+        {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+        },
+        {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+            "default": "We connect millions of buyers and sellers around the world, empowering people & creating economic opportunity for all."
+        },
+        {
+            "type": "text",
+            "id": "description",
+            "label": "Description",
+            "default": "Within our markets, millions of people around the world connect, both online and offline, to make, sell and buy unique goods. We also offer a wide range of Seller Services and tools that help creative entrepreneurs start, manage & scale their businesses."
+        }
+        ],
+    "presets": [
+        {
+            "name": "About Delivery"
+        }
+    ]
+}
+{% endschema %}
+
+
+<section class="h-[450px] w-full flex items-center justify-center gap-4">
+    {% if section.settings.image != blank %}
+        {{ section.settings.image | image_url: width: 1600 | image_tag: class: 'w-[646px] h-[420px] object-cover rounded-xl' }}
+    {% else %}
+        {{ 'image' | placeholder_svg_tag: 'w-[646px] h-[420px] object-cover bg-gray-200 rounded-xl' }}
+    {% endif %}
+    <div class="content w-[646px] h-[420px] flex flex-col justify-center items-center rounded-xl bg-[#E2E4EB]">
+        <div class="w-[454px] flex flex-col items-start gap-[30px]">
+            <h1 class="font-bold text-[18px]">{{ section.settings.title }}</h1>
+            <p class="text-[14px]">{{ section.settings.description }}</p>
+            <button class="w-[174px] h-[50px] bg-secondary text-white rounded-xl"> our showreel</button>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,148 @@
+{% schema %}
+{
+  "name": "New Brand Collection",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Brand New For You"
+    },
+
+    {
+      "type": "collection",
+      "id": "product_collection",
+      "label": "Select Collection"
+    },
+
+    {
+      "type": "range",
+      "id": "product_limit",
+      "label": "Number Of Products",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 4
+    },
+
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Shop Now"
+    },
+
+    {
+      "type": "text",
+      "id": "default_description",
+      "label": "Default Description",
+      "default": "Premium quality product for your daily needs"
+    }
+  ],
+
+  "presets": [
+    {
+      "name": "New Brand Collection"
+    }
+  ]
+}
+{% endschema %}
+<section class="full-width max-w-[1300px] mx-auto px-6">
+  <!-- Header -->
+  <div class="w-full md:max-w-[900px] lg:max-w-[1240px] flex justify-between items-center py-4 px-4">
+    <h2 class="text-lg font-semibold">
+      {{ section.settings.heading }}
+    </h2>
+
+    <!-- Arrows -->
+    <div class="flex gap-2 bg-gray-100 rounded-lg px-1">
+      <button class="swiper-button-prev-custom">←</button>
+      <button class="swiper-button-next-custom">→</button>
+    </div>
+  </div>
+
+  <!-- Swiper -->
+  <div class="max-w-[1240px] px-4">
+    <div class="swiper mySwiper">
+      <div class="swiper-wrapper">
+        {% assign collection = collections[section.settings.product_collection] %}
+
+        {% if collection != blank %}
+          {% for product in collection.products limit: section.settings.product_limit %}
+            <!-- Slide -->
+            <div class="swiper-slide">
+              <div class="flex flex-col gap-2 h-[378px]">
+                <div
+                  class="
+                    w-full max-w-[200px] md:max-w-[260px] lg:max-w-[300px]
+                    h-[180px] md:h-[210px] lg:h-[230px] overflow-hidden
+                  "
+                >
+                  {% if product.featured_image %}
+                    <img
+                      src="{{ product.featured_image | image_url: width: 500 }}"
+                      alt="{{ product.title }}"
+                      class="w-full h-full object-cover"
+                    >
+                  {% else %}
+                    <div class="w-full h-full bg-gray-200 flex items-center justify-center text-sm">No Image</div>
+                  {% endif %}
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <h3 class="text-base font-bold font-inter px-2 line-clamp-1">
+                    {{ product.title }}
+                  </h3>
+
+                  <p class="text-sm font-inter text-[#666666] px-2 line-clamp-2">
+                    {{ product.description | strip_html | default: section.settings.default_description }}
+                  </p>
+                  <div class="mt-auto px-2 pb-2">
+                    <a
+                      href="{{ product.url }}"
+                      class="text-xs text-secondary font-medium border border-secondary rounded-lg w-[123px] h-[34.5px] flex items-center justify-center"
+                    >
+                      {{ section.settings.button_text }}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  function initSwiper() {
+    new Swiper('.mySwiper', {
+      loop: true,
+      slidesPerView: 1,
+      spaceBetween: 16,
+
+      navigation: {
+        nextEl: '.swiper-button-next-custom',
+        prevEl: '.swiper-button-prev-custom',
+      },
+
+      breakpoints: {
+        640: {
+          slidesPerView: 2,
+        },
+        768: {
+          slidesPerView: 3,
+        },
+        1024: {
+          slidesPerView: 4,
+        },
+      },
+    });
+  }
+
+  // normal page load
+  document.addEventListener("DOMContentLoaded", initSwiper);
+
+  // Shopify editor load (VERY IMPORTANT)
+  document.addEventListener("shopify:section:load", initSwiper);
+</script>
