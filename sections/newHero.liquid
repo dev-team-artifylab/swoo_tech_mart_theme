@@ -1,0 +1,249 @@
+{% schema %}
+{
+    "name": "New Hero Section",
+    "settings": [
+
+            {
+                "type": "text",
+                "id": "hero_title",
+                "label": "Hero Title",
+                "default": "SALE 40% OFF"
+            },
+            
+            {
+                "type": "image_picker",
+                "id": "hero_image",
+                "label": "Main Hero Image"
+            },
+            {
+                "type": "text",
+                "id": "main_hero_title",
+                "label": "Main Hero Title",
+                "default": "Noise Cancelling Headphone"
+            },
+            {
+                "type": "text",
+                "id": "main_hero_description",
+                "label": "Main Hero Description",
+                "default": "Boso Over-Ear Headphone Wifi, Voice Assistant, Low latency game mode"
+            },
+            {
+                "type": "collection",
+                "id": "main_hero_link",
+                "label": "Main Hero Link"
+            },
+            {
+                "type": "image_picker",
+                "id": "hero_image_2",
+                "label": "Main Hero Image 2"
+            },
+            {
+                "type": "text",
+                "id": "main_hero_title_2",
+                "label": "Main Hero Title 2",
+                "default": "Sono Playgo 5 from $569"
+            },
+            {
+                "type": "collection",
+                "id": "main_hero_link_2",
+                "label": "Main Hero Link 2"
+            },
+            {
+                "type": "image_picker",
+                "id": "hero_image_3",
+                "label": "Main Hero Image 3"
+            },
+            {
+                "type": "text",
+                "id": "main_hero_title_3",
+                "label": "Main Hero Title 3",
+                "default": "Logitek Bluetooth Keyboard"
+            },
+            {
+                "type": "collection",
+                "id": "main_hero_link_3",
+                "label": "Main Hero Link 3"
+            },
+            {
+                "type": "image_picker",
+                "id": "hero_image_4",
+                "label": "Main Hero Image 4"
+            },
+            {
+                "type": "text",
+                "id": "main_hero_title_4",
+                "label": "Main Hero Title 4",
+                "default": "Sport Water Resistance Watch"
+            },
+            {
+                "type": "collection",
+                "id": "main_hero_link_4",
+                "label": "Main Hero Link 4"
+            },
+            {
+                "type": "image_picker",
+                "id": "hero_image_5",
+                "label": "Main Hero Image 5"
+            },
+            {
+                "type": "text",
+                "id": "main_hero_title_5",
+                "label": "Main Hero Title 5",
+                "default": "OKODo hero 11+ black"
+            },
+            {
+                "type": "text",
+                "id": "main_hero_price_5",
+                "label": "Main Hero Price 5",
+                "default": "$120"
+            }
+        ],
+
+    "blocks": [
+        {
+            "type": "Catelory",
+            "name": "Catelory",
+            "limit": 10,
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "catelory_name",
+                    "label": "Catelory Name",
+                    "default": "CLOTHING"
+                },
+                {
+                    "type": "collection",
+                    "id": "catelory_link",
+                    "label": "Catelory Link"
+                }
+            ]
+        }
+    ],
+
+    "presets": [
+        {
+            "name": "New Hero Section"
+        }
+    ]
+}
+{% endschema %}
+
+
+<section class="max-w-[1400px] mx-auto h-[480px] flex gap-4 px-4">
+
+  <!-- Left Sidebar -->
+  <div class="w-[300px] h-full flex flex-col pl-4 pt-8">
+    <h1 class="font-bold text-[14px] text-[#F1352B]">{{ section.settings.hero_title }}</h1>
+
+    {% for block in section.blocks %}
+        <div class="flex gap-4 pt-2">
+            <a href="{{ block.settings.catelory_link }}" class="text-[12px] font-semibold inline">
+        {{ block.settings.catelory_name }}
+        </a>
+        
+        </div>
+    {% endfor %}
+  </div>
+
+  <!-- Right Content -->
+  <div class="flex-1 flex gap-4 flex-col lg:flex-row">
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col gap-4 pt-2">
+
+      <!-- Big Image -->
+      <div class="w-full h-[320px] relative">
+        <img src="{{ section.settings.hero_image | image_url }}" 
+             width="{{ section.settings.hero_image.width }}"
+             height="{{ section.settings.hero_image.height }}"
+             alt="{{ section.settings.hero_image.alt | escape }}"
+             class="w-full h-full object-cover rounded-xl relative">
+
+            <div class="absolute top-20 left-10 h-[200px] w-[250px] flex flex-col gap-4">
+                <h1 class="text-[30px] text-white">{{ section.settings.main_hero_title }}</h1>
+                <p class="text-[12px] text-white opacity-70">{{ section.settings.main_hero_description }}</p>
+                <button class="bg-white text-black text-center w-[90px] h-[34px] rounded-xl text-[12px]">
+                    <a href="{{ section.settings.main_hero_link }}">BUY NOW</a>
+                </button>
+            </div>
+      </div>
+
+      <!-- Small Images -->
+      <div class="flex items-center justify-center gap-2 ">
+        
+          <div class="w-1/2 relative">
+            <img src="{{ section.settings.hero_image_2 | image_url }}" 
+               width="{{ section.settings.hero_image_2.width }}"
+               height="{{ section.settings.hero_image_2.height }}"
+               alt="{{ section.settings.hero_image_2.alt | escape }}"
+               class="w-full h-full object-cover rounded-xl">
+
+            <div class="absolute top-10 left-10 flex flex-col items-start gap-4">
+                <h1 class="text-[16px] font-bold w-[120px]">{{ section.settings.main_hero_title_2 }}</h1>
+                <button class="text-[12px] underline">
+                    <a href="{{ section.settings.main_hero_link_2 }}">Discover now</a>
+                </button>
+            </div>
+
+          </div>
+       
+        
+          <div class="w-1/2 relative">
+            <img src="{{ section.settings.hero_image_3 | image_url }}" 
+               width="{{ section.settings.hero_image_3.width }}"
+               height="{{ section.settings.hero_image_3.height }}"
+               alt="{{ section.settings.hero_image_3.alt | escape }}"
+               class="w-full h-full object-cover rounded-xl">
+
+            <div class="absolute top-8 left-8 flex flex-col items-start gap-4">
+                <h1 class="text-[16px] text-white font-bold w-[140px]">{{ section.settings.main_hero_title_3 }}</h1>
+                <button class="text-[12px] underline">
+                    <a href="{{ section.settings.main_hero_link_3 }}">Best for all device</a>
+                </button>
+            </div>
+        
+          </div>
+      </div>
+
+    </div>
+
+    <!-- Right Side Images -->
+    <div class="w-full lg:w-[360px] h-full flex flex-row lg:flex-col gap-6 pt-2">
+
+      <div class="w-1/2 lg:w-full h-[120px] lg:h-[215px] relative">
+        <img src="{{ section.settings.hero_image_4 | image_url }}" 
+             width="{{ section.settings.hero_image_4.width }}"
+             height="{{ section.settings.hero_image_4.height }}"
+             alt="{{ section.settings.hero_image_4.alt | escape }}"
+             class="w-[90%] h-[90%] object-cover rounded-xl">
+
+        <div class="absolute top-8 left-48 flex flex-col items-start gap-4">
+            <h1 class="font-semibold text-[20px] ">{{ section.settings.main_hero_title_4 }}</h1>
+            <button class="text-[12px] w-[92px] h-[32px] rounded-xl bg-[#333333] text-white">
+                <a href="{{ section.settings.main_hero_link_4 }}">SHOP NOW</a>
+            </button>
+        </div>
+
+      </div>
+
+      <div class="w-1/2 lg:w-full h-[120px] lg:h-[115px] relative">
+        <img src="{{ section.settings.hero_image_5 | image_url }}" 
+             width="{{ section.settings.hero_image_5.width }}"
+             height="{{ section.settings.hero_image_5.height }}"
+             alt="{{ section.settings.hero_image_5.alt | escape }}"
+             class="w-[90%] h-[90%] object-cover rounded-xl">
+
+        <div class="absolute top-8 left-4 flex flex-col items-start gap-2">
+            <h1 class="text-white text-[32px] w-[180px]">{{ section.settings.main_hero_title_5 }}</h1>
+            <p class="text-white text-[10px] font-bold opacity-50 m-0">FROM</p>
+            <p class="text-white text-[24px] font-bold m-0">{{ section.settings.main_hero_price_5 }}</p>
+        </div>
+      </div>
+
+      
+
+    </div>
+
+  </div>
+
+</section>
