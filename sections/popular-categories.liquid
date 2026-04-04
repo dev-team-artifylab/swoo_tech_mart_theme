@@ -1,0 +1,93 @@
+<section class="max-w-[1200px] mx-auto px-4 py-12 font-sans">
+  <h2 class="text-[20px] font-bold uppercase tracking-tight mb-8 text-gray-900">
+    {{ section.settings.title }}
+  </h2>
+
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-y-10 gap-x-6">
+    {% for block in section.blocks %}
+      <a href="{{ block.settings.link }}" class="group flex items-center justify-between transition-opacity hover:opacity-80">
+        
+        <div class="flex-1 pr-2">
+          <h3 class="text-[15px] font-bold text-gray-900 leading-snug">
+            {{ block.settings.category_name }}
+          </h3>
+          <p class="text-[13px] text-gray-500 mt-1">
+            {{ block.settings.item_count }} Items
+          </p>
+        </div>
+
+        <div class="w-[70px] h-[70px] flex-shrink-0 flex items-center justify-center overflow-hidden">
+          {% if block.settings.image != blank %}
+            <img 
+              src="{{ block.settings.image | image_url: width: 140 }}" 
+              alt="{{ block.settings.category_name }}"
+              class="max-w-full max-h-full object-contain"
+              loading="lazy"
+            >
+          {% else %}
+            {{ 'image' | placeholder_svg_tag: 'w-full h-full bg-gray-100' }}
+          {% endif %}
+        </div>
+
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+
+
+{% schema %}
+{
+  "name": "Popular Categories",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "POPULAR CATEGORIES"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "text",
+          "id": "category_name",
+          "label": "Category Name",
+          "default": "iPhone (iOS)"
+        },
+        {
+          "type": "text",
+          "id": "item_count",
+          "label": "Item Count",
+          "default": "74"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Category Image"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Category Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Popular Categories",
+      "blocks": [
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" }
+      ]
+    }
+  ]
+}
+{% endschema %}
