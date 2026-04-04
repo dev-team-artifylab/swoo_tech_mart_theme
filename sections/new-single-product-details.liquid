@@ -1,0 +1,205 @@
+
+<!-- Breadcrumb -->
+  <nav class="max-w-[1240px] max-h-[81px] flex items-center p-4">
+    <a href="/" class="hover:text-black transition ">Home</a>
+    <span>/</span>
+    <a href="/collections/all" class="hover:text-black transition">Shop</a>
+    {% if product.collections.first %}
+      <span>/</span>
+      <a href="{{ product.collections.first.url }}" class="hover:text-black transition">
+        {{- product.collections.first.title -}}
+      </a>
+    {% endif %}
+    {% if product.type != blank and product.collections.first %}
+      <span>/</span>
+      <span class="text-gray-600">{{ product.type }}</span>
+    {% endif %}
+  </nav>
+{%  render 'product-details' %} 
+{% render 'frequently-bought-together' %}
+<section class="single-product-details">
+  <!-- Tabs -->
+  <div class="product-description-div max-w-[1240px] h-auto px-4">
+    <div class="p-4 flex gap-6">
+      <button class="font-bold">
+        <a>Description</a>
+      </button>
+      <button>
+        <a>Reviews</a>
+      </button>
+      <button>
+        <a>Additional Information</a>
+      </button>
+    </div>
+
+    <!-- Main Description -->
+    <p class="p-4">{{ section.settings.main_description }}</p>
+
+    <!-- Main Image -->
+    <div class="rounded-lg h-[365px] w-full">
+      {% if section.settings.main_image != blank %}
+        <img src="{{ section.settings.main_image | image_url }}" alt="Main Image" class="w-full h-full object-cover">
+      {% else %}
+        <p>Image Placeholder</p>
+      {% endif %}
+    </div>
+
+    <!-- Manufacturer Info -->
+    <h6 class="font-bold px-4 pt-4">{{ section.settings.manufacturer_title }}</h6>
+    <p class="px-4 py-2">{{ section.settings.manufacturer_text_1 }}</p>
+    <p class="px-4 py-2">{{ section.settings.manufacturer_text_2 }}</p>
+
+    <!-- Two Image Containers -->
+    <div class="w-full h-[416px] flex gap-4 p-4">
+      <div class="w-1/2 h-full">
+        {% if section.settings.image_1 != blank %}
+          <img src="{{ section.settings.image_1 | image_url }}" alt="Image 1" class="w-full h-full object-cover">
+        {% else %}
+          <p>Image 1</p>
+        {% endif %}
+      </div>
+      <div class="w-1/2 h-full">
+        {% if section.settings.image_2 != blank %}
+          <img src="{{ section.settings.image_2 | image_url }}" alt="Image 2" class="w-full h-full object-cover">
+        {% else %}
+          <p>Image 2</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Related Products (Dynamic via Blocks) -->
+  <div class="max-w-[1240px] mx-auto px-4 py-10">
+    <h5 class="text-l font-bold py-4">Related Products</h5>
+
+    <div class="flex gap-4 overflow-x-auto">
+      <div class="w-full h-auto  flex items-center justify-center">
+        {% if section.settings.related_collection %}
+          {% for product in section.settings.related_collection.products limit: 5 %}
+            <div class="related-product-card p-2 min-w-[200px]">
+              {% render 'product-card-new', product: product %}
+            </div>
+          {% endfor %}
+        {% else %}
+          <p>Please select a collection</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Recently Viewed -->
+  <div class="max-w-[1240px] mx-auto px-4 py-10">
+    <div class="flex justify-between items-center py-4">
+      <div class="flex gap-6">
+        <p class="text-l font-bold">Your Recently Viewed</p>
+        <button class="text-xs">View All</button>
+      </div>
+
+      <div class="flex gap-4 text-xs">
+        <button>Previous</button>
+        <button>Next</button>
+      </div>
+    </div>
+
+    {% assign collection = section.settings.recent_collection %}
+
+    {% if collection != blank %}
+      <div class="flex gap-4 overflow-x-auto">
+        {% for product in collection.products limit: 4 %}
+          <div class="max-w-[325px] max-h-[116px] flex gap-4">
+            <div class="w-[126px] h-[90px]">
+              <img
+                src="{{ product.featured_image | image_url }}"
+                class="w-full h-full object-cover"
+                alt="{{ product.title }}"
+              >
+            </div>
+
+            <div>
+              {% comment %} <p>{{ product.type }}</p> {% endcomment %}
+              <h4>{{ product.title | truncatewords: 5 }}</h4>
+              <p class="text-l font-bold">{{ product.price | money }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Single Product Details",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "frequently_bought_collection",
+      "label": "Select Collection for Products"
+    },
+    {
+      "type": "image_picker",
+      "id": "side_image_1",
+      "label": "Upload Image 1 for Right Column"
+    },
+    {
+      "type": "image_picker",
+      "id": "side_image_2",
+      "label": "Upload Image 2 for Right Column"
+    },
+    {
+      "type": "textarea",
+      "id": "main_description",
+      "label": "Main Description",
+      "default": "Write product description here..."
+    },
+    {
+      "type": "image_picker",
+      "id": "main_image",
+      "label": "Main Image"
+    },
+    {
+      "type": "text",
+      "id": "manufacturer_title",
+      "label": "Manufacturer Title",
+      "default": "From the manufacturer"
+    },
+    {
+      "type": "textarea",
+      "id": "manufacturer_text_1",
+      "label": "Manufacturer Text 1"
+    },
+    {
+      "type": "textarea",
+      "id": "manufacturer_text_2",
+      "label": "Manufacturer Text 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_1",
+      "label": "Left Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "Right Image"
+    },
+    {
+      "type": "collection",
+      "id": "related_collection",
+      "label": "Select Collection"
+    },
+    {
+      "type": "collection",
+      "id": "recent_collection",
+      "label": "Select Collection"
+    }
+  ],
+  "blocks": [
+  ],
+  "presets": [
+    {
+      "name": "Single Product Details"
+    }
+  ]
+}
+{% endschema %}
