@@ -12,12 +12,23 @@
 
     <!-- Heading -->
     <div class="flex flex-col gap-2">
-      <h1 class="text-[28px] font-bold text-green-600">Welcome Back</h1>
-      <p class="text-sm text-gray-400 tracking-wide">LOGIN TO CONTINUE</p>
+      <h1 class="text-[28px] font-bold text-green-600">Register</h1>
+      <p class="text-sm text-gray-400 tracking-wide">Join to us</p>
     </div>
 
     <!-- Shopify Login Form -->
     <form method="post" action="/account/login" class="space-y-4 flex flex-col gap-[25px]">
+
+      <!-- First Name -->
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium">Your Name</label>
+        <input 
+          type="text" 
+          name="customer[first_name]" 
+          placeholder="Jhon Doe"
+          class="border rounded-md w-[507px] h-[42px] pl-2"
+        >
+      </div>
 
       <!-- Email -->
       <div class="flex flex-col gap-1">
@@ -39,9 +50,18 @@
           placeholder="••••"
           class="border rounded-md w-[507px] h-[42px] pl-2"
         >
-        <a href="/account/recover" class="text-sm text-gray-400 underline block pt-[8px]">
-            Forgot Password?
-        </a>
+      </div>
+
+
+      <!-- Confirm Password -->
+      <div class="flex flex-col ">
+        <label class="text-sm font-medium ">Confirm Password</label>
+        <input 
+          type="password" 
+          name="customer[password_confirmation]" 
+          placeholder="••••"
+          class="border rounded-md w-[507px] h-[42px] pl-2"
+        >
       </div>
 
       <!-- Forgot Password -->
@@ -52,15 +72,15 @@
             type="submit" 
         class="w-[140px] h-[52px] bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition mt-4"
     >
-    LOGIN
+    REGISTER
     </button>
     </div>
 
       <!-- Signup -->
       <p class="text-sm text-gray-500  pt-[15px]">
-        NEW USER? 
-        <a href="/pages/registation" class="text-green-600 font-medium">
-          SIGN UP
+        ALREADY USER ? 
+        <a href="/pages/login" class="text-green-600 font-medium">
+          LOGIN
         </a>
       </p>
 
@@ -72,7 +92,7 @@
 
 {% schema %}
 {
-    "name": "Login",
+    "name": "Registration",
     "settings": [
             {
                 "type": "range",
