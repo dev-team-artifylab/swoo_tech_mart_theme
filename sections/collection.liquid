@@ -1,47 +1,394 @@
-{% comment %}
-  This section is used in the collection template to render collection page
-  listing all products within a collection.
 
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/collection
-{% endcomment %}
+<section
+  class="max-auto max-w-7xl px-4  font-sans text-black"
+  id="MainCollectionSection"
+  data-id="{{ section.id }}"
+>
+  <div class="flex flex-col gap-10 md:flex-row">
+    <aside class="w-full md:w-64 flex-shrink-0" id="ProductFiltersContainer">
+      <div class="bg-[#EEEFF6] px-6 py-2">
+        <div class="flex justify-between items-center pb-2 border-b border-gray-300">
+          <h2 class="text-l font-bold mb-6">CATEGORIES</h2>
+          <a
+            href="{{ collection.url }}?sort_by={{ collection.sort_by }}"
+            class="js-filter-link inline-flex px-3 py-2 text-[14px]"
+          >
+            Reset All
+          </a>
+        </div>
+        <ul class="text-xs">
+          {% for link in section.settings.menu.links %}
+            <li class="menu-item">
+              <!-- Parent -->
+              <div class="flex justify-between items-center p-2 rounded hover:bg-gray-50">
+                <a href="{{ link.url }}" class="text-gray-700">
+                  {{ link.title }}
+                </a>
 
-<h1>{{ collection.title }}</h1>
+                {% if link.links != blank %}
+                  <button class="menu-toggle text-gray-400">›</button>
+                {% endif %}
+              </div>
 
-<div class="collection-products">
-  {% paginate collection.products by 20 %}
-    {% for product in collection.products %}
-      <div class="collection-product">
-        {% if product.featured_image %}
-          {% render 'image',
-            class: 'collection-product__image',
-            image: product.featured_image,
-            url: product.url,
-            width: 400,
-            height: 400,
-            crop: 'center'
-          %}
-        {% endif %}
-        <div class="collection-product__content">
-          <p>{{ product.title | escape | link_to: product.url }}</p>
-          <p>{{ product.price | money }}</p>
+              <!-- Dropdown -->
+              {% if link.links != blank %}
+                <ul class="submenu hidden pl-4">
+                  {% for childlink in link.links %}
+                    <li class="p-2 hover:bg-gray-50">
+                      <a href="{{ childlink.url }}">
+                        {{ childlink.title }}
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </li>
+          {% endfor %}  
+        </ul>
+
+        {%- for filter in collection.filters -%}
+          <div class="mb-8 border-b border-gray-300 pb-14 filter-group">
+            <div class="flex justify-between items-center py-3">
+              <div class="title-div">
+                <h3 class="mb-4 font-bold">{{ filter.label }}</h3>
+              </div>
+              
+            </div>
+            <div class="filter-content">
+              {%- case filter.type -%}
+                {%- when 'list' -%}
+                  {%- if filter.label contains 'Color' or filter.label contains 'color' -%}
+                    <div class="flex flex-wrap gap-3">
+                      {%- for value in filter.values -%}
+                        {%- liquid
+                          # TOGGLE LOGIC: Use url_to_remove if active to allow deselection
+                          if value.active
+                            assign target_url = value.url_to_remove
+                          else
+                            assign target_url = value.url_to_add
+                          endif
+                        -%}
+                        <a
+                          href="{{ target_url }}"
+                          class="js-filter-link h-8 w-8 rounded-full border border-black/10 transition-all hover:scale-110 {% if value.active %}ring-2 ring-black ring-offset-2{% endif %}"
+                          style="background-color: {{ value.label | downcase }};"
+                          title="{{ value.label }}"
+                        ></a>
+                      {%- endfor -%}
+                    </div>
+                  {%- else -%}
+                    <div class="flex flex-col">
+                      {%- for value in filter.values -%}
+                        {%- liquid
+                          if value.active
+                            assign target_url = value.url_to_remove
+                          else
+                            assign target_url = value.url_to_add
+                          endif
+                        -%}
+                       
+                          {% if filter.label contains "by Screen size" %}
+                            <div class="flex items-center gap-2">
+                              <a
+                          href="{{ target_url }}"
+                          class="js-filter-link flex items-center gap-2 px-2 py-1.5 text-xs font-medium transition-colors "
+                        >
+
+                              {{ value.label }}
+                            </a>
+                            </div>
+                          {% else %}
+                           <a
+                          href="{{ target_url }}"
+                          class="js-filter-link flex items-center gap-2 px-2 py-1.5 text-xs font-medium transition-colors hover:bg-gray-100 rounded"
+                        >
+                            <input type="checkbox" {% if value.active %}checked{% endif %} class="pointer-events-none">
+                            {{ value.label }}
+                          </a>
+                          {% endif %}
+                          
+                      {%- endfor -%}
+                    </div>
+                  {%- endif -%}
+
+                {%- when 'price_range' -%}
+                  <div class="price-range-wrapper">
+                    <input
+                      type="range"
+                      min="0"
+                      max="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                      value="{{ filter.max_value.value | default: filter.range_max | money_without_currency | replace: ',', '' }}"
+                      id="PriceRangeSlider"
+                      class="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-secondary accent-secondary"
+                    >
+                    <div class="flex justify-between items-center  text-xs font-medium mt-2">
+                      <span>{{- filter.min_value.value | default: filter.range_min | money -}}TK 0</span>
+                      <span>-</span>
+                      <span id="PriceValueDisplay">
+                        {{- filter.max_value.value | default: filter.range_max | money -}}
+                      </span>
+                      <button id="PriceGoBtn" type="button" class="ml-2 px-3 py-1 bg-secondary text-white text-xs font-semibold rounded-full">GO</button>
+                    </div>
+                  </div>
+              {%- endcase -%}
+            </div>
+          </div>
+        {%- endfor -%}
+
+        <img src="{{ 'filterBanner.png' | asset_url }}" alt="Filter Banner" width="300" height="200" class="w-[300px] h-[200px] object-cover rounded-lg">
+      </div>
+    </aside>
+
+    <main class="flex-1 relative" id="ProductGridContainer">
+      <div
+        id="GridOverlay"
+        class="absolute inset-0 bg-white/50 z-10 hidden transition-opacity items-center justify-center"
+      >
+        <div class="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+      </div>
+
+      <!-- Main Div -->
+      <div class="">
+        <!-- Top -->
+        <div class="flex flex-col justify-around gap-4 pb-6 md:flex-row md:items-center border-b border-gray-200 mb-6">
+          <!-- Collection Title -->
+          <div>
+            
+            <p class="text-sm text-gray-400 " id="ProductCount">
+              {% if collection.products.size == 0 %}
+                No products found
+              {% else %}
+                <span class="font-semibold text-black">1–{{ collection.products.size }}</span> of {{ collection.products_count }} Results
+              {% endif %}
+            </p>
+          </div>
+
+          <!-- Sort Dropdown -->
+          <div class="relative inline-block text-left">
+            <button
+              id="SortToggle"
+              class="text-sm font-medium flex items-center gap-1"
+            >
+              Sort By:
+              <span id="CurrentSort">Most Popular</span>
+              <span>⌄</span>
+            </button>
+
+            <div
+              id="SortMenu"
+              class="hidden absolute right-0 mt-2 w-44 bg-white rounded-xl border shadow-md z-20 text-sm"
+            >
+              <a href="?sort_by=best-selling" class="block px-4 py-2 hover:bg-gray-50">Most Popular</a>
+              <a href="?sort_by=manual" class="block px-4 py-2 hover:bg-gray-50">Featured</a>
+              <a href="?sort_by=price-ascending" class="block px-4 py-2 hover:bg-gray-50">Price: Low to High</a>
+              <a href="?sort_by=price-descending" class="block px-4 py-2 hover:bg-gray-50">Price: High to Low</a>
+              <a href="?sort_by=created-descending" class="block px-4 py-2 hover:bg-gray-50">Newest</a>
+              <a href="?sort_by=title-ascending" class="block px-4 py-2 hover:bg-gray-50">A → Z</a>
+            </div>
+          </div>
+
+          <div class="itmes">View As</div>
+        </div>
+        <!-- end -->
+
+        <!-- Product Div -->
+        <div class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          {% paginate collection.products by section.settings.products_per_page %}
+            {% for product in collection.products %}
+              {% render 'product-card', product_item: product %}
+            {% endfor %}
+
+            {% if paginate.pages > 1 %}
+              <div class="col-span-full mt-10">
+                <div class="flex items-center justify-center gap-2 px-3 py-2">
+                  <!-- Previous -->
+                  <div>
+                    {% if paginate.previous %}
+                      <a
+                        href="{{ paginate.previous.url }}"
+                        class="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300"
+                      >
+                        ← Previous
+                      </a>
+                    {% endif %}
+                  </div>
+
+                  <!-- Numbers -->
+                  <div class="flex items-center gap-2 text-sm">
+
+                    {% for part in paginate.parts %}
+
+                      {% if part.is_link %}
+                        <!-- Normal page -->
+                        <a href="{{ part.url }}"
+                          class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100 transition">
+                          {{ part.title }}
+                        </a>
+
+                      {% else %}
+                        <!-- Active page -->
+                        <span class="px-3 py-1 border rounded-md bg-[#1ABA1A] text-white font-medium">
+                          {{ part.title }}
+                        </span>
+
+                      {% endif %}
+
+                    {% endfor %}
+
+              </div>
+
+                  <!-- Next -->
+                  <div>
+                    {% if paginate.next %}
+                      <a
+                        href="{{ paginate.next.url }}"
+                        class="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 hover:bg-gray-50 transition"
+                      >
+                        Next →
+                      </a>
+                    {% endif %}
+                  </div>  
+                </div>
+              </div>
+            {% endif %}
+          {% endpaginate %}
         </div>
       </div>
-    {% endfor %}
+    </main>
+    
+  </div>
 
-    {{ paginate | default_pagination }}
-  {% endpaginate %}
-</div>
+</section>
 
-{% stylesheet %}
-  .collection-products {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+<style>
+  /* Custom slider styling */
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 18px;
+    width: 18px;
+    border-radius: 50%;
+    background: black;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
   }
-{% endstylesheet %}
+</style>
+<script>
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.menu-toggle');
+    if (!btn) return;
+
+    const item = btn.closest('.menu-item');
+    const submenu = item.querySelector('.submenu');
+
+    submenu.classList.toggle('hidden');
+
+    btn.classList.toggle('rotate-90');
+  });
+</script>
+<!-- Most Popular Section JS -->
+<script>
+  document.addEventListener('click', (e) => {
+    const toggle = e.target.closest('#SortToggle');
+    const menu = document.querySelector('#SortMenu');
+
+    if (toggle) {
+      menu.classList.toggle('hidden');
+      return;
+    }
+
+    if (!e.target.closest('#SortMenu')) {
+      menu.classList.add('hidden');
+    }
+  });
+</script>
+<!-- End Most Popular Section JS -->
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const sectionId = document.querySelector('#MainCollectionSection').dataset.id;
+    const overlay = document.querySelector('#GridOverlay');
+
+    const updateView = async (url) => {
+      if (overlay) overlay.classList.replace('hidden', 'flex');
+
+      try {
+        const response = await fetch(`${url}${url.includes('?') ? '&' : '?'}section_id=${sectionId}`);
+        const text = await response.text();
+        const html = new DOMParser().parseFromString(text, 'text/html');
+
+        // Dynamic Content Swap
+        document.querySelector('#ProductGridContainer').innerHTML =
+          html.querySelector('#ProductGridContainer').innerHTML;
+        document.querySelector('#ProductFiltersContainer').innerHTML =
+          html.querySelector('#ProductFiltersContainer').innerHTML;
+        document.querySelector('#ProductCount').innerHTML = html.querySelector('#ProductCount').innerHTML;
+
+        // Sync Browser URL
+        window.history.pushState({ path: url }, '', url);
+      } catch (err) {
+        console.error('AJAX Error:', err);
+      } finally {
+        if (overlay) overlay.classList.replace('flex', 'hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+
+    // Handle Clicks (Links & Filters)
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('.js-filter-link');
+      if (link) {
+        e.preventDefault();
+        updateView(link.getAttribute('href'));
+      }
+    });
+
+    // Price Slider Logic — update display only on drag
+    document.addEventListener('input', (e) => {
+      if (e.target.id === 'PriceRangeSlider') {
+        const val = e.target.value;
+        document.querySelector('#PriceValueDisplay').textContent = `$${val}`;
+      }
+    });
+
+    // GO Button — apply price filter immediately
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('#PriceGoBtn')) {
+        const slider = document.querySelector('#PriceRangeSlider');
+        if (!slider) return;
+        const val = slider.value;
+        const url = new URL(window.location.href);
+        url.searchParams.set('filter.v.price.lte', val);
+        url.searchParams.set('filter.v.price.gte', '0');
+        updateView(url.toString());
+      }
+    });
+  });
+</script>
 
 {% schema %}
 {
-  "name": "t:general.collection",
-  "settings": []
+  "name": "Collection Grid",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 6,
+      "max": 24,
+      "step": 3,
+      "label": "Products per page",
+      "default": 9
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Category menu"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Grid"
+    }
+  ]
 }
 {% endschema %}
