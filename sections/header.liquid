@@ -1,4 +1,4 @@
-<header class="">
+<header id="main-header" class="">
   <h2 class="header__title">
     {{ shop.name | link_to: routes.root_url }}
   </h2>
@@ -17,61 +17,39 @@
     {% endif %}
 
     <a href="{{ routes.cart_url }}">
-      {% if cart.item_count > 0 %}
-        <sup>{{ cart.item_count }}</sup>
-      {% endif %}
+      <sup id="cart-count">
+        {{ cart.item_count }}
+      </sup>
 
       {{ 'icon-cart.svg' | inline_asset_content }}
+
+      <span id="cart-total">
+        {{ cart.total_price | money }}
+      </span>
     </a>
   </div>
 </header>
 
-{% stylesheet %}
-  header {
-    height: 5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  header a {
-    position: relative;
-    text-decoration: none;
-    color: var(--color-foreground);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  header a sup {
-    position: absolute;
-    left: 100%;
-    overflow: hidden;
-    max-width: var(--page-margin);
-  }
-  header svg {
-    width: 2rem;
-  }
-  header .header__menu,
-  header .header__icons {
-    display: flex;
-    gap: 1rem;
-  }
-{% endstylesheet %}
+<script>
+  document.addEventListener('cart:updated', function (e) {
+    const cart = e.detail;
 
-{% schema %}
-{
-  "name": "t:general.header",
-  "settings": [
-    {
-      "type": "link_list",
-      "id": "menu",
-      "label": "t:labels.menu"
-    },
-    {
-      "type": "link_list",
-      "id": "customer_account_menu",
-      "label": "t:labels.customer_account_menu",
-      "default": "customer-account-main-menu"
+    const header = document.getElementById('main-header');
+    if (!header) return;
+
+    const cartCount = header.querySelector('#cart-count');
+    const cartTotal = header.querySelector('#cart-total');
+
+    if (cartCount) {
+      cartCount.textContent = cart.item_count;
     }
-  ]
-}
-{% endschema %}
+
+    if (cartTotal) {
+      cartTotal.textContent =
+        'Tk ' +
+        (cart.total_price / 100).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+        });
+    }
+  });
+</script>

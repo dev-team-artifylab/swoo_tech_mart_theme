@@ -24,6 +24,7 @@
     
     {% # Load and preload the critical CSS %}
     {{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}
+    {{ 'cart.js' | asset_url | script_tag }}
 
     {% # Social, title, etc. %}
     {% render 'meta-tags' %}

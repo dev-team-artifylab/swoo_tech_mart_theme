@@ -233,13 +233,10 @@
 
   <div class="w-[252px] h-auto flex flex-col gap-3 ">
     <div class="w-full h-[520px] p-4 bg-gray-100">
-      {% assign total_price = 0 %}
-      {% for product in collections[section.settings.collection_handle].products limit: 3 %}
-        {% assign total_price = total_price | plus: product.price %}
-      {% endfor %}
-
       <p class="text-sm">Total Price:</p>
-      <p class="text-l font-bold">{{ total_price | money }}</p>
+      <p class="text-l font-bold" id="dynamic-price">
+        {{ product.price | money }}
+      </p>
 
       <div class="py-2">
         <hr>
@@ -255,11 +252,29 @@
 
         <div class="flex flex-col gap-2">
           <div class="w-[230px] h-[45px] flex justify-between items-center bg-white text-2xl font-bold px-4">
-            <button type="button" id="qty-decrease" class="text-gray-700">-</button>
+            <button type="button" id="qty-decrease" class="text-gray-700 cursor-pointer">-</button>
             <span id="qty-value" class="text-xl">1</span>
-            <button type="button" id="qty-increase" class="text-gray-700">+</button>
+            <button type="button" id="qty-increase" class="text-gray-700 cursor-pointer">+</button>
           </div>
-          <button class="w-[230px] h-[45px] bg-green-500 font-bold">Add To Cart</button>
+          <input
+            type="hidden"
+            id="variant-id"
+            value="{{ product.selected_or_first_available_variant.id }}"
+          >
+
+          <!-- Unit Price -->
+          <input
+            type="hidden"
+            id="unit-price"
+            value="{{ product.price }}"
+          >
+
+          <button
+            id="add-to-cart-btn"
+            class="w-[230px] h-[45px] bg-green-500 font-bold cursor-pointer"
+          >
+            Add To Cart
+          </button>
           <button class="w-[230px] h-[45px] bg-orange-500 font-bold">Buy With Paypal</button>
         </div>
         <div class="w-w-[230px] h-[45px]  flex justify-between px-2">
@@ -324,3 +339,85 @@
     </div>
   </div>
 </div>
+
+<script>
+  let qty = 1;
+
+  function formatMoney(cents) {
+    return (
+      'Tk ' +
+      (cents / 100).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+      })
+    );
+  }
+
+  function updatePrice() {
+    const unitPrice = parseInt(document.getElementById('unit-price').value);
+    const priceEl = document.getElementById('dynamic-price');
+
+    const total = unitPrice * qty;
+    priceEl.innerText = formatMoney(total);
+  }
+
+  // 🔥 NEW: Disable logic
+  function updateButtons() {
+    const btnDecrease = document.getElementById('qty-decrease');
+
+    if (qty <= 1) {
+      btnDecrease.disabled = true;
+      btnDecrease.classList.add('opacity-50', 'cursor-not-allowed');
+    } else {
+      btnDecrease.disabled = false;
+      btnDecrease.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    const increaseBtn = e.target.closest('#qty-increase');
+    const decreaseBtn = e.target.closest('#qty-decrease');
+    const addBtn = e.target.closest('#add-to-cart-btn');
+
+    const qtyValue = document.getElementById('qty-value');
+    const variantId = document.getElementById('variant-id')?.value;
+
+    // ➕ Increase
+    if (increaseBtn) {
+      qty++;
+      qtyValue.innerText = qty;
+      updatePrice();
+      updateButtons(); // 🔥
+    }
+
+    // ➖ Decrease
+    if (decreaseBtn) {
+      if (qty > 1) {
+        qty--;
+        qtyValue.innerText = qty;
+        updatePrice();
+        updateButtons(); // 🔥
+      }
+    }
+
+    // 🛒 Add to cart
+    if (addBtn) {
+      addBtn.innerText = 'Adding...';
+      addBtn.disabled = true;
+
+      window.addToCart(variantId, qty);
+
+      addBtn.innerText = 'Added ✓';
+
+      setTimeout(() => {
+        addBtn.innerText = 'Add To Cart';
+        addBtn.disabled = false;
+      }, 1500);
+    }
+  });
+
+  // 🚀 Initial load
+  document.addEventListener('DOMContentLoaded', () => {
+    updatePrice();
+    updateButtons(); // 🔥 IMPORTANT
+  });
+</script>

@@ -1,37 +1,552 @@
-{% comment %}
-  This section is used in the cart template to render /cart page with an
-  overview of the items in customer's cart.
+{% comment %} Cart Page - Matches Figma Design {% endcomment %}
 
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/cart
-{% endcomment %}
+<div class="cart-page-wrapper">
 
-<h1>{{ 'cart.title' | t }}</h1>
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/">Home</a>
+    <span>/</span>
+    <a href="/pages">pages</a>
+    <span>/</span>
+    <span class="active">cart</span>
+  </div>
 
-<form action="{{ routes.cart_url }}" method="post">
-  <table>
-    {% for item in cart.items %}
-      <tr>
-        <td>
-          {% render 'image', image: item.image, url: item.url %}
-        </td>
-        <td>
-          <p>{{ item.product.title }}</p>
-          {{ 'cart.remove' | t | link_to: item.url_to_remove }}
-        </td>
-        <td>
-          <input type="text" name="updates[]" value="{{ item.quantity }}">
-          <input type="submit" value="{{ 'cart.update' | t }}">
-        </td>
-      </tr>
-    {% endfor %}
-  </table>
+  <div class="cart-layout">
 
-  <input type="submit" name="checkout" value="{{ 'cart.checkout' | t }}">
-</form>
+    <!-- Left: Cart Items -->
+    <div class="cart-items-col">
+      {% if cart.item_count == 0 %}
+        <div class="empty-cart">
+          <p>Your cart is empty. <a href="/">Continue shopping</a></p>
+        </div>
+      {% else %}
+        {% for item in cart.items %}
+          <div class="cart-item" data-line="{{ forloop.index }}" data-variant-id="{{ item.variant_id }}">
 
-{% schema %}
-{
-  "name": "t:general.cart",
-  "settings": []
-}
-{% endschema %}
+            <!-- Badge -->
+            <div class="item-badge-wrap">
+              {% if item.line_level_discount_allocations.size > 0 %}
+                <span class="badge badge-save">
+                  SAVE ${{ item.line_level_discount_allocations.first.amount | divided_by: 100 | ceil }}
+                </span>
+              {% elsif item.product.tags contains 'new' %}
+                <span class="badge badge-new">NEW</span>
+              {% endif %}
+
+              <!-- Product Image -->
+              <a href="{{ item.url }}">
+                <img
+                  src="{{ item.image | image_url: width: 180 }}"
+                  alt="{{ item.title }}"
+                  class="item-image"
+                >
+              </a>
+            </div>
+
+            <!-- Item Details -->
+            <div class="item-details">
+
+              <!-- Top row: title + color swatches + remove -->
+              <div class="item-top-row">
+                <div class="item-meta">
+                  <!-- Rating placeholder -->
+                  {% if item.product.metafields.reviews.rating_count %}
+                    <span class="item-rating">({{ item.product.metafields.reviews.rating_count }})</span>
+                  {% endif %}
+
+                  <a href="{{ item.url }}" class="item-title">{{ item.product.title }}</a>
+
+                  <!-- Variant info -->
+                  {% unless item.product.has_only_default_variant %}
+                    <p class="item-variant">{{ item.variant.title }}</p>
+                  {% endunless %}
+                </div>
+
+                <!-- Color circles (decorative swatches) -->
+                <div class="item-swatches">
+                  <span class="swatch swatch-gray"></span>
+                  <span class="swatch swatch-pink"></span>
+                </div>
+
+                <!-- Remove -->
+                <button class="item-remove" data-line="{{ forloop.index }}" aria-label="Remove item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Price -->
+              <p class="item-price">{{ item.final_line_price | money }}</p>
+
+              <!-- Qty Stepper -->
+              <div class="qty-stepper">
+                <button class="qty-btn qty-minus" data-line="{{ forloop.index }}">&#8722;</button>
+                <span class="qty-display">{{ item.quantity }}</span>
+                <button class="qty-btn qty-plus" data-line="{{ forloop.index }}">&#43;</button>
+              </div>
+
+              <!-- Tags / Badges -->
+              <div class="item-tags">
+                {% if item.product.tags contains 'free-shipping' %}
+                  <span class="tag tag-free-shipping">FREE SHIPPING</span>
+                {% endif %}
+                {% if item.variant.title contains '2.88' or item.product.tags contains 'paid-shipping' %}
+                  <span class="tag tag-paid-shipping">$2.88 SHIPPING</span>
+                {% endif %}
+                {% if item.product.tags contains 'free-gift' %}
+                  <span class="tag tag-free-gift">FREE GIFT</span>
+                {% endif %}
+              </div>
+
+              <!-- Stock Status -->
+              {% if item.variant.available %}
+                <p class="item-stock in-stock">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#22c55e"><circle cx="12" cy="12" r="12"/><path d="M7 12l3 3 7-7" stroke="white" stroke-width="2" fill="none"/></svg>
+                  In stock
+                </p>
+              {% else %}
+                <p class="item-stock out-of-stock">Out of stock</p>
+              {% endif %}
+
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Right: Order Summary -->
+    <div class="order-summary">
+      <h2 class="summary-title">Order Summary</h2>
+
+      <div class="summary-row">
+        <span>Sub Total:</span>
+        <span id="summary-subtotal">{{ cart.total_price | money }}</span>
+      </div>
+
+      <div class="summary-row">
+        <span>Shipping estimate:</span>
+        <span id="summary-shipping">
+          {% assign shipping_total = 0 %}
+          {% for item in cart.items %}
+            {% if item.product.tags contains 'free-shipping' %}
+              {% comment %}free{% endcomment %}
+            {% else %}
+              {% assign shipping_total = shipping_total | plus: 288 %}
+            {% endif %}
+          {% endfor %}
+          {% if shipping_total == 0 %}
+            FREE
+          {% else %}
+            {{ shipping_total | money }}
+          {% endif %}
+        </span>
+      </div>
+
+      <div class="summary-row">
+        <span>Tax estimate:</span>
+        <span id="summary-tax">{{ cart.total_price | times: 0.137 | money }}</span>
+      </div>
+
+      <div class="summary-row summary-total">
+        <span>ORDER TOTAL:</span>
+        <span id="summary-order-total">
+          {% assign tax = cart.total_price | times: 0.137 | round %}
+          {% assign grand_total = cart.total_price | plus: shipping_total | plus: tax %}
+          {{ grand_total | money }}
+        </span>
+      </div>
+
+      <a href="/checkout" class="checkout-btn">CHECKOUT</a>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .cart-page-wrapper {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+    font-family: sans-serif;
+  }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .breadcrumb a { color: #888; text-decoration: none; }
+  .breadcrumb a:hover { color: #333; }
+  .breadcrumb .active { color: #333; font-weight: 500; }
+
+  /* Layout */
+  .cart-layout {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+  }
+
+  /* Cart Items Column */
+  .cart-items-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Cart Item Card */
+  .cart-item {
+    background: #fff;
+    border: 1px solid #f0f0f0;
+    border-radius: 2px;
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+    position: relative;
+  }
+
+  /* Badge + Image Wrap */
+  .item-badge-wrap {
+    position: relative;
+    flex-shrink: 0;
+    width: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 7px;
+    border-radius: 2px;
+    z-index: 1;
+    line-height: 1;
+  }
+  .badge-save { background: #22c55e; color: #fff; }
+  .badge-new  { background: #333; color: #fff; }
+
+  .item-image {
+    width: 130px;
+    height: 130px;
+    object-fit: contain;
+    display: block;
+  }
+
+  /* Item Details */
+  .item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .item-top-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .item-meta { flex: 1; }
+
+  .item-rating {
+    font-size: 12px;
+    color: #999;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .item-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #222;
+    text-decoration: none;
+    display: block;
+    line-height: 1.4;
+  }
+  .item-title:hover { color: #22c55e; }
+
+  .item-variant {
+    font-size: 12px;
+    color: #888;
+    margin-top: 2px;
+  }
+
+  /* Swatches */
+  .item-swatches {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #e5e5e5;
+    display: inline-block;
+  }
+  .swatch-gray { background: #aaa; }
+  .swatch-pink { background: #f4b8b8; }
+
+  /* Remove */
+  .item-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #bbb;
+    padding: 2px;
+    flex-shrink: 0;
+    transition: color 0.2s;
+  }
+  .item-remove:hover { color: #e53935; }
+
+  /* Price */
+  .item-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #e53935;
+    margin: 0;
+  }
+
+  /* Qty Stepper */
+  .qty-stepper {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    width: fit-content;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .qty-btn {
+    width: 34px;
+    height: 34px;
+    background: #f9f9f9;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #444;
+  }
+  .qty-btn:hover { background: #eee; }
+  .qty-display {
+    width: 40px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    padding: 6px 0;
+  }
+
+  /* Tags */
+  .item-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 2px;
+    letter-spacing: 0.3px;
+  }
+  .tag-free-shipping { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+  .tag-paid-shipping  { background: #f5f5f5; color: #555; border: 1px solid #ddd; }
+  .tag-free-gift      { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
+
+  /* Stock */
+  .item-stock {
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0;
+  }
+  .in-stock { color: #16a34a; }
+  .out-of-stock { color: #e53935; }
+
+  /* Empty Cart */
+  .empty-cart {
+    padding: 40px;
+    text-align: center;
+    font-size: 16px;
+    color: #666;
+  }
+  .empty-cart a { color: #22c55e; text-decoration: underline; }
+
+  /* Order Summary */
+  .order-summary {
+    width: 280px;
+    flex-shrink: 0;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    padding: 24px 20px;
+    background: #fff;
+    position: sticky;
+    top: 20px;
+  }
+
+  .summary-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #222;
+    margin: 0 0 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #555;
+    padding: 10px 0;
+    border-bottom: 1px solid #f5f5f5;
+  }
+
+  .summary-total {
+    font-size: 14px;
+    font-weight: 700;
+    color: #222;
+    border-bottom: none;
+    margin-top: 4px;
+  }
+
+  .checkout-btn {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    background: #22c55e;
+    color: #fff;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 14px 0;
+    border-radius: 2px;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .checkout-btn:hover { background: #16a34a; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .cart-layout { flex-direction: column; }
+    .order-summary { width: 100%; position: static; }
+    .cart-item { flex-direction: column; }
+    .item-badge-wrap { width: 100%; height: 180px; }
+    .item-image { width: 160px; height: 160px; }
+  }
+</style>
+
+<script>
+  document.addEventListener('click', async function (e) {
+    // Remove item
+    const removeBtn = e.target.closest('.item-remove');
+    if (removeBtn) {
+      const line = removeBtn.dataset.line;
+      await updateCartLine(line, 0);
+    }
+
+    // Qty + 
+    const plusBtn = e.target.closest('.qty-plus');
+    if (plusBtn) {
+      const line = plusBtn.dataset.line;
+      const display = plusBtn.closest('.qty-stepper').querySelector('.qty-display');
+      const newQty = parseInt(display.innerText) + 1;
+      await updateCartLine(line, newQty);
+    }
+
+    // Qty -
+    const minusBtn = e.target.closest('.qty-minus');
+    if (minusBtn) {
+      const line = minusBtn.dataset.line;
+      const display = minusBtn.closest('.qty-stepper').querySelector('.qty-display');
+      const currentQty = parseInt(display.innerText);
+      if (currentQty > 1) {
+        await updateCartLine(line, currentQty - 1);
+      }
+    }
+  });
+
+  async function updateCartLine(line, quantity) {
+    const res = await fetch('/cart/change.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ line: parseInt(line), quantity })
+    });
+    const cart = await res.json();
+
+    if (quantity === 0) {
+      // Remove the item row from DOM
+      const itemEl = document.querySelector(`.cart-item[data-line="${line}"]`);
+      if (itemEl) itemEl.remove();
+      // Re-index remaining items
+      document.querySelectorAll('.cart-item').forEach((el, i) => {
+        el.dataset.line = i + 1;
+        el.querySelectorAll('[data-line]').forEach(btn => btn.dataset.line = i + 1);
+      });
+    } else {
+      // Update qty display
+      const itemEl = document.querySelector(`.cart-item[data-line="${line}"]`);
+      if (itemEl) {
+        itemEl.querySelector('.qty-display').innerText = quantity;
+        // Update price (line price)
+        const lineItem = cart.items[parseInt(line) - 1];
+        if (lineItem) {
+          itemEl.querySelector('.item-price').innerText = formatMoney(lineItem.final_line_price);
+        }
+      }
+    }
+
+    updateSummary(cart);
+
+    // Sync header cart count/total
+    if (window.syncCartUI) window.syncCartUI(cart);
+  }
+
+  function formatMoney(cents) {
+    return '$' + (cents / 100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  function updateSummary(cart) {
+    const subtotalEl = document.getElementById('summary-subtotal');
+    const orderTotalEl = document.getElementById('summary-order-total');
+    const taxEl = document.getElementById('summary-tax');
+
+    if (subtotalEl) subtotalEl.innerText = formatMoney(cart.total_price);
+
+    const tax = Math.round(cart.total_price * 0.137);
+    if (taxEl) taxEl.innerText = formatMoney(tax);
+
+    // Shipping: calculate from items
+    let shipping = 0;
+    cart.items.forEach(item => {
+      const hasFreeShipping = item.properties && item.properties['_free_shipping'];
+      const tagFree = item.product_type; // fallback, actual tag check via Liquid
+      if (!hasFreeShipping) shipping += 288;
+    });
+
+    const shippingEl = document.getElementById('summary-shipping');
+    if (shippingEl) shippingEl.innerText = shipping === 0 ? 'FREE' : formatMoney(shipping);
+
+    const total = cart.total_price + shipping + tax;
+    if (orderTotalEl) orderTotalEl.innerText = formatMoney(total);
+  }
+</script>
