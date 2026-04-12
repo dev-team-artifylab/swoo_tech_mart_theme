@@ -186,73 +186,83 @@
       </div>
 
       <!-- RIGHT SIDE -->
-      <div class="col-span-3 flex flex-col gap-4">
+<div class="col-span-3 flex flex-col gap-4">
 
-        {% for block in section.blocks %}
+  {% for block in section.blocks %}
 
-        {% if block.type == 'promo_top' %}
-        <div class="bg-gradient-to-r from-green-100 to-green-200 rounded-xl relative h-[215px] overflow-hidden">
+  <!-- 🔼 TOP CARD -->
+  {% if block.type == 'promo_top' %}
+  <div class="relative h-[215px] rounded-xl overflow-hidden">
 
-          <div class="absolute left-[20px] top-[20px] max-w-[140px]">
+    <!-- Background Image -->
+    {% if block.settings.image %}
+      <img 
+        src="{{ block.settings.image | image_url }}"
+        class="absolute inset-0 w-full h-full object-cover object-[85%_center]"
+      >
+    {% endif %}
 
-            <p class="text-[11px] text-gray-600 mb-[4px]">
-              {{ block.settings.label }}
-            </p>
+    <!-- Overlay -->
+    <div class="absolute inset-0 bg-black/10"></div>
 
-            <h4 class="text-[16px] font-semibold leading-tight mb-[10px]">
-              {{ block.settings.title }}
-            </h4>
+   <div class="absolute  float-right pl-[20px] mr-[20px] right-[20px] top-[20px] max-w-[140px] text-right z-10">
 
-            <button class="bg-gray-800 text-white px-[12px] py-[5px] rounded-full text-[11px]">
-              {{ block.settings.btn }}
-            </button>
+  <p class="text-[11px] text-gray-700 mb-[4px]">
+    {{ block.settings.label }}
+  </p>
 
-          </div>
+  <h4 class="text-[16px] font-semibold  max-w-full text-right mb-[10px]">
+    {{ block.settings.title }}
+  </h4>
 
-          {% if block.settings.image %}
-            <img 
-              src="{{ block.settings.image | image_url }}"
-             class="absolute inset-0 w-full h-full object-cover object-[85%_center]"
-            >
-          {% endif %}
+  <button class="ml-auto block bg-gray-800 text-white px-[12px] py-[5px] rounded-full text-[11px]">
+    {{ block.settings.btn }}
+  </button>
 
-          <div class="absolute inset-0 bg-black/10"></div>
+</div>
 
-        </div>
-        {% endif %}
+  </div>
+  {% endif %}
 
-        {% if block.type == 'promo_bottom' %}
-        <div class="bg-gray-900 text-white rounded-xl relative h-[215px] overflow-hidden">
 
-          <div class="absolute left-[20px] top-[20px]">
+  <!-- 🔽 BOTTOM CARD -->
+  {% if block.type == 'promo_bottom' %}
+  <div class="relative h-[215px] rounded-xl overflow-hidden text-white">
 
-            <p class="text-[12px] opacity-80">
-              {{ block.settings.brand }}
-            </p>
+    <!-- Background Image -->
+    {% if block.settings.image %}
+      <img 
+        src="{{ block.settings.image | image_url }}"
+        class="absolute inset-0 w-full h-full object-cover"
+      >
+    {% endif %}
 
-            <h4 class="text-[20px] font-semibold leading-tight mt-[4px] mb-[10px]">
-              {{ block.settings.title }}
-            </h4>
+    <!-- Dark Overlay -->
+    <div  class="absolute inset-s-0 bg-black/40"></div>
 
-            <p class="text-green-400 text-[18px] font-semibold">
-              {{ block.settings.price }}
-            </p>
+    <!-- Content (FRONT) -->
+    <div class="absolute right-[20px] top-[20px] z-10">
 
-          </div>
+      <p class="text-[12px] opacity-80">
+        {{ block.settings.brand }}
+      </p>
 
-          {% if block.settings.image %}
-            <img 
-              src="{{ block.settings.image | image_url }}"
-              class="absolute right-0 bottom-0 h-[170px] object-contain"
-            >
-          {% endif %}
+      <h4 class="text-[20px] font-semibold leading-tight mt-[4px] mb-[10px]">
+        {{ block.settings.title }}
+      </h4>
 
-        </div>
-        {% endif %}
+      <p class="text-green-400 text-[18px] font-semibold">
+        {{ block.settings.price }}
+      </p>
 
-        {% endfor %}
+    </div>
 
-      </div>
+  </div>
+  {% endif %}
+
+  {% endfor %}
+
+</div>
 
     </div>
 

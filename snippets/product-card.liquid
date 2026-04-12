@@ -1,47 +1,347 @@
-<section class="max-w-[1240px] px-4 mx-auto pt-4">
-  
-  {% assign collection = collections[section.settings.product_collection] %}
+{%- liquid
+  assign product = product_item
+  assign first_variant = product.selected_or_first_available_variant
+  assign compare_price = first_variant.compare_at_price
+  assign current_price = first_variant.price
+  assign is_new = false
+  assign days_old = 'now' | date: '%s' | minus: product.published_at | divided_by: 86400
+  if days_old < 30
+    assign is_new = true
+  endif
+  assign has_discount = false
+  if compare_price > current_price
+    assign has_discount = true
+    assign savings = compare_price | minus: current_price
+  endif
+  assign is_available = product.available
+  assign color_option = nil
+  for option in product.options_with_values
+    if option.name == 'Color' or option.name == 'Colour'
+      assign color_option = option
+    endif
+  endfor
+-%}
 
-  <div class="flex gap-2">
+<a href="{{ product.url }}" class="pc-card" id="ProductCard-{{ product.id }}">
 
-    {% for product in collection.products limit: section.settings.products_to_show %}
+  {%- comment %} Image Wrapper {%- endcomment %}
+  <div class="pc-img-wrap">
 
-      <div class="w-[224px] h-[425px] bg-white shadow rounded-lg p-3">
+    {%- comment %} Badges {%- endcomment %}
+    <div class="pc-badges">
+      {%- if has_discount -%}
+        <span class="pc-badge pc-badge--save">SAVE {{ savings | money_without_trailing_zeros }}</span>
+      {%- elsif is_new -%}
+        <span class="pc-badge pc-badge--new">NEW</span>
+      {%- endif -%}
+      {%- unless is_available -%}
+        <span class="pc-badge pc-badge--oos">OUT OF STOCK</span>
+      {%- endunless -%}
+    </div>
 
-        <!-- Product Image -->
-        <div class="w-full h-[200px] flex items-center justify-center">
-          <img 
-            src="{{ product.featured_image | image_url: width: 300 }}" 
-            alt="{{ product.title }}"
-            class="object-contain h-full"
-          >
-        </div>
+    {%- comment %} Wishlist {%- endcomment %}
+    <button
+      class="pc-wish"
+      aria-label="Add {{ product.title | escape }} to wishlist"
+      onclick="event.preventDefault(); this.classList.toggle('pc-wish--active')"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+    </button>
 
-        <!-- Product Info -->
-        <p class="text-sm text-gray-500 mt-2 flex justify-center">
-          ({{ product.variants.size }})
-        </p>
-
-        <h3 class="text-sm font-semibold line-clamp-2">
-          {{ product.title }}
-        </h3>
-
-        <!-- Price -->
-        <p class="text-lg font-bold text-red-500 mt-1">
-          {{ product.price | money }}
-        </p>
-
-        <!-- Stock -->
-        {% if product.available %}
-          <p class="text-green-600 text-sm mt-1">In stock</p>
-        {% else %}
-          <p class="text-red-500 text-sm mt-1">Out of stock</p>
-        {% endif %}
-
+    {%- comment %} Product Image {%- endcomment %}
+    {%- if product.featured_image -%}
+      <img
+        src="{{ product.featured_image | image_url: width: 400 }}"
+        alt="{{ product.featured_image.alt | default: product.title | escape }}"
+        width="400"
+        height="400"
+        loading="lazy"
+        class="pc-img"
+      >
+    {%- else -%}
+      <div class="pc-img-placeholder">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+          <polyline points="21 15 16 10 5 21"/>
+        </svg>
       </div>
-
-    {% endfor %}
-
+    {%- endif -%}
   </div>
 
-</section>
+  {%- comment %} Card Body {%- endcomment %}
+  <div class="pc-body">
+
+    {%- comment %} Review Count {%- endcomment %}
+    {%- if product.metafields.reviews.rating_count != blank -%}
+      <div class="pc-stars">
+        {%- assign rating = product.metafields.reviews.rating.value | round -%}
+        {%- for i in (1..5) -%}
+          {%- if i <= rating -%}<span class="pc-star pc-star--filled">★</span>{%- else -%}<span class="pc-star">☆</span>{%- endif -%}
+        {%- endfor -%}
+        <span class="pc-review-count">({{ product.metafields.reviews.rating_count }})</span>
+      </div>
+    {%- else -%}
+      <div class="pc-stars">
+        {%- assign variant_count = product.variants.size -%}
+        {%- if variant_count > 0 -%}
+          <span class="pc-review-count">({{ variant_count }})</span>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment %} Title {%- endcomment %}
+    <h3 class="pc-title">{{ product.title }}</h3>
+
+    {%- comment %} Price {%- endcomment %}
+    <div class="pc-price-row">
+      {%- if product.price_varies -%}
+        <span class="pc-price">{{ product.price_min | money }} – {{ product.price_max | money }}</span>
+      {%- else -%}
+        <span class="pc-price">{{ product.price | money }}</span>
+      {%- endif -%}
+      {%- if has_discount -%}
+        <span class="pc-compare">{{ compare_price | money }}</span>
+      {%- endif -%}
+    </div>
+
+    {%- comment %} Shipping / Gift badges {%- endcomment %}
+    <div class="pc-perks">
+      {%- if product.tags contains 'free-shipping' or product.tags contains 'FREE SHIPPING' -%}
+        <span class="pc-perk pc-perk--ship">FREE SHIPPING</span>
+      {%- else -%}
+        {%- assign ship_price = first_variant.weight | times: 0 -%}
+        <span class="pc-perk pc-perk--ship">FREE SHIPPING</span>
+      {%- endif -%}
+      {%- if product.tags contains 'free-gift' or product.tags contains 'FREE GIFT' -%}
+        <span class="pc-perk pc-perk--gift">FREE GIFT</span>
+      {%- endif -%}
+    </div>
+
+    {%- comment %} Stock status {%- endcomment %}
+    <div class="pc-stock">
+      {%- if product.tags contains 'pre-order' or product.tags contains 'PRE-ORDER' -%}
+        <span class="pc-stock__label pc-stock__label--preorder">PRE-ORDER</span>
+      {%- elsif is_available -%}
+        <span class="pc-stock__dot pc-stock__dot--in"></span>
+        <span class="pc-stock__label">In stock</span>
+      {%- else -%}
+        <span class="pc-stock__dot pc-stock__dot--out"></span>
+        <span class="pc-stock__label pc-stock__label--out">Out of stock</span>
+      {%- endif -%}
+    </div>
+
+    {%- comment %} Color swatches {%- endcomment %}
+    {%- if color_option != nil -%}
+      <div class="pc-swatches">
+        {%- for value in color_option.values -%}
+          <span
+            class="pc-swatch"
+            title="{{ value }}"
+            style="background-color: {{ value | downcase | replace: ' ', '' }};"
+          ></span>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+</a>
+
+<style>
+  .pc-card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    position: relative;
+  }
+  .pc-card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+    transform: translateY(-2px);
+  }
+
+  /* Image */
+  .pc-img-wrap {
+    position: relative;
+    background: #f9f9f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    overflow: hidden;
+  }
+  .pc-img {
+    max-height: 100%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+  .pc-card:hover .pc-img { transform: scale(1.04); }
+  .pc-img-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Badges */
+  .pc-badges {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 2;
+  }
+  .pc-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .pc-badge--save  { background: #19a85a; color: #fff; }
+  .pc-badge--new   { background: #333; color: #fff; }
+  .pc-badge--oos   { background: #e53e3e; color: #fff; }
+
+  /* Wishlist */
+  .pc-wish {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    background: rgba(255,255,255,0.85);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.2s, background 0.2s;
+  }
+  .pc-wish:hover,
+  .pc-wish--active { color: #e53e3e; background: #fff; }
+  .pc-wish--active svg { fill: #e53e3e; stroke: #e53e3e; }
+
+  /* Body */
+  .pc-body {
+    padding: 12px 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+  }
+
+  /* Stars */
+  .pc-stars {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 12px;
+    color: #f5a623;
+    min-height: 18px;
+  }
+  .pc-star { line-height: 1; }
+  .pc-star--filled { color: #f5a623; }
+  .pc-review-count { color: #999; font-size: 11px; margin-left: 2px; }
+
+  /* Title */
+  .pc-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #222;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: 0;
+  }
+
+  /* Price */
+  .pc-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .pc-price {
+    font-size: 16px;
+    font-weight: 700;
+    color: #e53e3e;
+  }
+  .pc-compare {
+    font-size: 12px;
+    color: #aaa;
+    text-decoration: line-through;
+  }
+
+  /* Perks */
+  .pc-perks {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .pc-perk {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .pc-perk--ship { border: 1px solid #19a85a; color: #19a85a; }
+  .pc-perk--gift { border: 1px solid #e5a700; color: #e5a700; }
+
+  /* Stock */
+  .pc-stock {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #333;
+  }
+  .pc-stock__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .pc-stock__dot--in  { background: #19a85a; }
+  .pc-stock__dot--out { background: #e53e3e; }
+  .pc-stock__label--out     { color: #e53e3e; }
+  .pc-stock__label--preorder { color: #999; font-weight: 600; font-size: 11px; border: 1px solid #bbb; padding: 1px 6px; border-radius: 3px; }
+
+  /* Swatches */
+  .pc-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .pc-swatch {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.15);
+    display: inline-block;
+    transition: transform 0.15s;
+    cursor: pointer;
+  }
+  .pc-swatch:hover { transform: scale(1.2); outline: 2px solid #333; outline-offset: 1px; }
+</style>

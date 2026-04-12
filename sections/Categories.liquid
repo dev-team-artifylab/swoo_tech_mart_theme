@@ -1,0 +1,26 @@
+<section>
+    <div class="flex gap-4">
+        {% for block in section.blocks %}
+            {% render 'collection-snp', collection: block.settings.collection %}
+        {% endfor %}
+    </div>
+</section>
+
+{% schema %}
+{
+  "name": "Categories",
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

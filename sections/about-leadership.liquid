@@ -1,0 +1,54 @@
+{% schema %}
+{
+    "name": "About Leadership",
+    "settings": [
+        
+        ],
+    "blocks": [
+        {
+            "type": "timeline_item",
+            "name": "Timeline Item",
+            "settings": [
+                {
+                    "type": "image_picker",
+                    "id": "image",
+                    "label": "Image"
+                },
+                {
+                    "type": "text",
+                    "id": "name",
+                    "label": "Name",
+                    "default": "Name"
+                },
+                {
+                    "type": "text",
+                    "id": "position",
+                    "label": "Position",
+                    "default": "Position"
+                }
+            ]
+        }
+    ],
+    
+    "presets": [
+        {
+            "name": "About Leadership"
+        }
+    ]
+}
+{% endschema %}
+
+<section>
+    <h1 class="font-bold text-[18px]">leaderships</h1>
+    <div class="flex">
+        {% for block in section.blocks %}
+            <div class="flex flex-col items-center">
+                {% if block.settings.image != blank %}
+                    {{ block.settings.image | image_url: width: 1600 | image_tag: class: 'w-[254px] h-[320px] object-cover rounded-xl' }}
+                {% endif %}
+                <h1 class="font-bold text-[16px]">{{ block.settings.name }}</h1>
+                <p class="text-[12px]">{{ block.settings.position }}</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>

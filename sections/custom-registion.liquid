@@ -1,0 +1,117 @@
+<section class="max-w-[1360px] mx-auto h-[624px] flex items-center" style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+
+  <!-- Left Image -->
+  <div class="w-1/2 flex justify-center items-center">
+    <img src="{{ 'login.svg.png' | asset_url }}" 
+         alt="login" 
+         class="w-[400px] h-auto object-contain">
+  </div>
+
+  <!-- Right Form -->
+  <div class="w-1/2 px-10 flex flex-col gap-[30px]">
+
+    <!-- Heading -->
+    <div class="flex flex-col gap-2">
+      <h1 class="text-[28px] font-bold text-green-600">Register</h1>
+      <p class="text-sm text-gray-400 tracking-wide">Join to us</p>
+    </div>
+
+    <!-- Shopify Login Form -->
+    <form method="post" action="/account/login" class="space-y-4 flex flex-col gap-[25px]">
+
+      <!-- First Name -->
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium">Your Name</label>
+        <input 
+          type="text" 
+          name="customer[first_name]" 
+          placeholder="Jhon Doe"
+          class="border rounded-md w-[507px] h-[42px] pl-2"
+        >
+      </div>
+
+      <!-- Email -->
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium">Email Address</label>
+        <input 
+          type="email" 
+          name="customer[email]" 
+          placeholder="Example@gmail.com"
+          class="border rounded-md w-[507px] h-[42px] pl-2"
+        >
+      </div>
+
+      <!-- Password -->
+      <div class="flex flex-col ">
+        <label class="text-sm font-medium ">Password</label>
+        <input 
+          type="password" 
+          name="customer[password]" 
+          placeholder="••••"
+          class="border rounded-md w-[507px] h-[42px] pl-2"
+        >
+      </div>
+
+
+      <!-- Confirm Password -->
+      <div class="flex flex-col ">
+        <label class="text-sm font-medium ">Confirm Password</label>
+        <input 
+          type="password" 
+          name="customer[password_confirmation]" 
+          placeholder="••••"
+          class="border rounded-md w-[507px] h-[42px] pl-2"
+        >
+      </div>
+
+      <!-- Forgot Password -->
+      <div class="flex flex-col gap-[30px] mt-4">
+        
+
+        <button 
+            type="submit" 
+        class="w-[140px] h-[52px] bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition mt-4"
+    >
+    REGISTER
+    </button>
+    </div>
+
+      <!-- Signup -->
+      <p class="text-sm text-gray-500  pt-[15px]">
+        ALREADY USER ? 
+        <a href="/pages/login" class="text-green-600 font-medium">
+          LOGIN
+        </a>
+      </p>
+
+    </form>
+
+  </div>
+</section>
+
+
+{% schema %}
+{
+    "name": "Registration",
+    "settings": [
+            {
+                "type": "range",
+                "id": "padding_top",
+                "label": "Padding Top",
+                "default": 20,
+                "min": 0,
+                "max": 100,
+                "step": 10
+            },
+            {
+                "type": "range",
+                "id": "padding_bottom",
+                "label": "Padding Bottom",
+                "default": 20,
+                "min": 0,
+                "max": 100,
+                "step": 10
+            }
+        ]
+}
+{% endschema %}
