@@ -1,0 +1,666 @@
+<section class="max-w-[1240px] mx-auto px-2" id="ProductSection-{{ section.id }}">
+  <!-- Breadcrumb -->
+  <nav class="flex flex-wrap items-center  px-2 py-6  font-satoshi font-light text-lg sm:text-sm text-gray-400 mb-8 sm:mb-8 gap-x-2">
+    <a href="/" class="hover:text-black transition ">Home</a>
+    <span>&gt;</span>
+    <a href="/collections/all" class="hover:text-black transition">Shop</a>
+    {% if product.collections.first %}
+      <span>&gt;</span>
+      <a href="{{ product.collections.first.url }}" class="hover:text-black transition">
+        {{- product.collections.first.title -}}
+      </a>
+    {% endif %}
+    {% if product.type != blank and product.collections.first %}
+      <span>&gt;</span>
+      <span class="text-gray-600">{{ product.type }}</span>
+    {% endif %}
+  </nav>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+    <!-- LEFT: Images -->
+    <div class="flex flex-col-reverse md:flex-row gap-4">
+      <!-- Thumbnails -->
+      <div class="flex md:flex-col gap-3 w-full md:w-20 overflow-x-auto md:overflow-visible pb-2 md:pb-0 -mx-1 md:mx-0">
+        {% for image in product.images %}
+          <button
+            class="thumbnail-btn flex-shrink-0 border-2 rounded-xl overflow-hidden transition-all duration-200 bg-gray-100 {% if forloop.first %}border-gray-300{% else %}border-transparent{% endif %}"
+            data-image-url="{{ image | img_url: '800x' }}"
+            data-image-id="{{ image.id }}"
+          >
+            <img
+              src="{{ image | img_url: '150x150', crop: 'center' }}"
+              alt="{{ image.alt }}"
+              class="w-16 h-16 md:w-full md:h-20 object-cover"
+            >
+          </button>
+        {% endfor %}
+      </div>
+
+      <!-- Main Image -->
+      <div class="flex-1 min-w-0 rounded-3xl bg-gray-100">
+        <img
+          id="MainProductImage"
+          src="{{ product.featured_image | img_url: '1200x' }}"
+          alt="{{ product.title }}"
+          class="w-full max-w-[444px] h-auto aspect-[444/530] object-cover rounded-3xl"
+        >
+      </div>
+    </div>
+
+    <!-- RIGHT: Product Info -->
+    <div class="flex flex-col justify-start gap-4 sm:gap-5">
+      <!-- Title -->
+      <h1 class="font-integral text-xl sm:text-2xl md:text-3xl lg:text-[40px] font-integral--color leading-tight text-product-title-desktop--line-height">
+        {{ product.title }}
+      </h1>
+
+      <!-- Rating -->
+
+      <div class="flex items-center gap-2">
+        <div class="flex text-yellow-400">
+          {% for i in (1..5) %}
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+          {% endfor %}
+        </div>
+        <span class="text-gray-500 text-sm">4.5/5</span>
+      </div>
+
+      <!-- Price -->
+      <div class="flex items-center gap-4 py-1">
+        <span class="text-product-price-desktop font-satoshi font-satoshi--weight text-[32px] leading-none">
+          {{ product.price | money }}
+        </span>
+
+        {% if product.compare_at_price > product.price %}
+          <span class="text-gray-400 line-through text-[32px] font-satoshi-discount leading-none">
+            {{ product.compare_at_price | money }}
+          </span>
+
+          <span class="bg-red-100 text-red-500 text-sm px-3 py-1 rounded-full font-satoshi-percentage">
+            -{{ product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price }}%
+          </span>
+        {% endif %}
+      </div>
+
+      <p class="text-gray-500 text-sm sm:text-[16px] leading-snug w-full max-w-[590px] mt-1 sm:mt-3">
+        {{ product.description | strip_html | truncatewords: 30 }}
+      </p>
+
+      <!-- Product Form -->
+      {% form 'product', product, class: 'product-form flex flex-col gap-6' %}
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+        {% for option in product.options_with_values %}
+          <div class="flex flex-col justify-start gap-4">
+            <h3 class="text-sm sm:text-[16px] text-black font-normal">
+              {% if option.name contains 'Color' or option.name contains 'Colour' -%}
+                Select Colors
+              {%- elsif option.name contains 'Size' or option.name contains 'size' -%}
+                Choose Size
+              {%- else -%}
+                {{- option.name -}}
+              {%- endif %}
+            </h3>
+
+            <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+              {% for value in option.values %}
+                <label class="cursor-pointer">
+                  <input
+                    type="radio"
+                    name="{{ option.name }}"
+                    value="{{ value }}"
+                    class="hidden peer"
+                    {% if option.selected_value == value %}
+                      checked
+                    {% endif %}
+                  >
+
+                  {% if option.name contains 'Color' or option.name contains 'Colour' %}
+                    {% comment %} Dynamic color mapping logic {% endcomment %}
+                    {% assign color_val = value | downcase %}
+                    {% comment %}
+                      {% case color_val %}
+                        {% when 'olive' %}{% assign color_val = '#556b2f' %}
+                        {% when 'navy' %}{% assign color_val = '#1e3a5f' %}
+                        {% when 'teal' %}{% assign color_val = '#0d9488' %}
+                        {% when 'black' %}{% assign color_val = '#000000' %}
+                        {% when 'white' %}{% assign color_val = '#ffffff' %}
+                        {% when 'blue' %}{% assign color_val = '#2563eb' %}
+                        {% when 'red' %}{% assign color_val = '#dc2626' %}
+                        {% when 'gray' or 'grey' %}{% assign color_val = '#6b7280' %}
+                      {% endcase %}
+                    {% endcomment %}
+
+                    <span
+                      class="color-swatch w-10 h-10 rounded-full  border-2 border-transparent peer-checked:border-gray-300 peer-checked:[&_svg]:opacity-100 flex items-center justify-center relative transition-all"
+                      style="background-color: {{ color_val }};"
+                    >
+                      <svg
+                        class="w-5 h-5 text-white opacity-0 transition-opacity pointer-events-none drop-shadow-sm"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M16 5L7 14L4 11"/>
+                      </svg>
+                    </span>
+                  {% else %}
+                    <span class="px-4 py-3 bg-white border border-gray-200 rounded-full text-[16px] text-gray-700 peer-checked:bg-black peer-checked:text-white peer-checked:border-black transition-colors">
+                      {{ value }}
+                    </span>
+                  {% endif %}
+                </label>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-6 pt-6 sm:pt-8">
+          <div class="flex items-center w-full sm:w-[170px] sm:min-w-[170px]">
+            <button
+              type="button"
+              data-qty-btn="minus"
+              class="flex items-center justify-center cursor-pointer w-12 h-12 border border-gray-200 rounded-l-lg bg-white text-black text-[16px] font-medium hover:bg-gray-50 transition"
+            >
+              −
+            </button>
+            <input
+              type="number"
+              name="quantity"
+              value="1"
+              min="1"
+              class="w-12 h-12 text-center border-y border-gray-200 bg-white text-[16px] font-medium focus:outline-none focus:ring-0"
+            >
+            <button
+              type="button"
+              data-qty-btn="plus"
+              class="flex items-center justify-center w-12 h-12 border cursor-pointer border-gray-200 rounded-r-lg bg-white text-black text-[16px] font-medium hover:bg-gray-50 transition"
+            >
+              +
+            </button>
+          </div>
+
+          <button
+            type="submit"
+            data-add-to-cart-btn
+            {% unless product.available %}
+              disabled
+            {% endunless %}
+            class="bg-black text-white rounded-xl h-[52px] w-full font-semibold hover:bg-gray-800 transition disabled:bg-gray-300 cursor-pointer"
+          >
+            <span data-add-to-cart-text>
+              {% if product.available %}Add to Cart{% else %}Sold Out{% endif %}
+            </span>
+          </button>
+        </div>
+      {% endform %}
+    </div>
+  </div>
+</section>
+
+<div id="ProductJson-{{ section.id }}-container" data-section-id="{{ section.id }}">
+  <script type="application/json" id="ProductJson-{{ section.id }}">
+    {
+      "variants": [
+        {% for variant in product.variants %}
+        {
+          "id": {{ variant.id }},
+          "option1": {{ variant.option1 | json }},
+          "option2": {{ variant.option2 | json }},
+          "option3": {{ variant.option3 | json }},
+          "price": {{ variant.price }},
+          "compare_at_price": {{ variant.compare_at_price | default: 0 }},
+          "price_formatted": {{ variant.price | money | json }},
+          "compare_at_price_formatted": {{ variant.compare_at_price | money | json }},
+          "available": {{ variant.available | json }},
+          "featured_image": {% if variant.featured_image %}{
+            "src": "{{ variant.featured_image | img_url: '1200x' }}",
+            "alt": {{ variant.featured_image.alt | default: product.title | json }},
+            "id": {{ variant.featured_image.id }}
+          }{% else %}null{% endif %}
+        }{% unless forloop.last %},{% endunless %}
+        {% endfor %}
+      ],
+      "option_names": [{% for option in product.options_with_values %}{{ option.name | json }}{% unless forloop.last %},{% endunless %}{% endfor %}]
+    }
+  </script>
+</div>
+
+<section class="max-w-[1240px] mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12" id="ProductTabsSection">
+  <div class="flex flex-col sm:flex-row border-b border-gray-200 mb-8 relative overflow-x-auto" role="tablist">
+    <button
+      class="tab-trigger flex-1 min-w-0 py-3 sm:pb-4 px-2 text-center text-xs sm:text-base text-gray-500 font-medium hover:text-black transition border-b-2 border-transparent whitespace-nowrap"
+      data-tab-target="#tab-details"
+    >
+      Product Details
+    </button>
+
+    <button
+      class="tab-trigger flex-1 min-w-0 py-3 sm:pb-4 px-2 text-center text-xs sm:text-base text-black font-bold border-b-2 border-black transition whitespace-nowrap"
+      data-tab-target="#tab-reviews"
+    >
+      Rating & Reviews
+    </button>
+
+    <button
+      class="tab-trigger flex-1 min-w-0 py-3 sm:pb-4 px-2 text-center text-xs sm:text-base text-gray-500 font-medium hover:text-black transition border-b-2 border-transparent whitespace-nowrap"
+      data-tab-target="#tab-faqs"
+    >
+      FAQs
+    </button>
+  </div>
+
+  <div class="tab-main-container">
+    <div id="tab-details" class="tab-pane hidden animate-in fade-in duration-300">
+      <div class="prose max-w-none py-4 sm:py-6">
+        <h2 class="text-xl sm:text-2xl font-bold mb-4">Product Specifications</h2>
+        <div class="text-gray-600 leading-relaxed">
+          {{ product.description }}
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-reviews" class="tab-pane animate-in fade-in duration-300">
+      
+
+      <!-- Start of Judge.me code -->
+      {% assign has_legacy = false -%}
+      {%- if product.metafields.judgeme.widget.size > 20 %}{% assign has_legacy = true %}{% endif %}
+      <div style="clear:both"></div>
+      <div
+        id="judgeme_product_reviews"
+        class="jdgm-widget jdgm-review-widget"
+        data-product-title="{{ product.title | escape }}"
+        data-id="{{ product.id }}"
+        data-product-id="{{ product.id }}"
+        data-widget="review"
+        data-auto-install="false"
+        data-shop-reviews-count="{{ shop.metafields.judgeme.shop_reviews_count | default: 0 | escape }}"
+        data-entry-point="review_widget.js"
+        data-entry-key="review-widget/main.js"
+      >
+        {% if has_legacy %}
+          <div class="jdgm-legacy-widget-content" style="display: none;">{{ product.metafields.judgeme.widget }}</div>
+        {% endif %}
+      </div>
+      {% if product.metafields.judgeme.review_widget_data %}
+        <script>
+          jdgm.data ||= {}; jdgm.data.reviewWidget ||= {}; jdgm.data.reviewWidget[{{ product.id }}] = {{ product.metafields.judgeme.review_widget_data }}
+        </script>
+      {% endif %}
+      <!-- End of Judge.me code -->
+
+      
+    </div>
+
+    <div id="tab-faqs" class="tab-pane hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div class="py-8 sm:py-12 max-w-3xl mx-auto">
+        <div class="text-center mb-10">
+          <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-gray-900 mb-2">Common Inquiries</h2>
+          <div class="h-1 w-12 bg-black mx-auto"></div>
+        </div>
+
+        <div class="space-y-4">
+          <details class="group border border-gray-200 rounded-xl px-6 py-4 transition-all duration-300 hover:border-black bg-white">
+            <summary class="flex justify-between items-center font-semibold text-lg list-none cursor-pointer">
+              <span class="pr-4">How does the {{ product.title }} fit?</span>
+              <span class="text-xs transition-transform duration-300 group-open:rotate-180">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </span>
+            </summary>
+            <div class="mt-4 text-gray-500 leading-relaxed border-t border-gray-50 pt-4">
+              Our items generally run true to size. We recommend ordering your usual size unless otherwise noted. For
+              the most accurate fit, please consult our detailed size chart.
+            </div>
+          </details>
+
+          <details class="group border border-gray-200 rounded-xl px-6 py-4 transition-all duration-300 hover:border-black bg-white">
+            <summary class="flex justify-between items-center font-semibold text-lg list-none cursor-pointer">
+              <span class="pr-4">What is your global shipping policy?</span>
+              <span class="text-xs transition-transform duration-300 group-open:rotate-180">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </span>
+            </summary>
+            <div class="mt-4 text-gray-500 leading-relaxed border-t border-gray-50 pt-4">
+              We offer complimentary express shipping on orders over $150. All orders are processed within 24 hours and
+              typically arrive within 3-5 business days depending on your location.
+            </div>
+          </details>
+
+          <details class="group border border-gray-200 rounded-xl px-6 py-4 transition-all duration-300 hover:border-black bg-white">
+            <summary class="flex justify-between items-center font-semibold text-lg list-none cursor-pointer">
+              <span class="pr-4">How do I initiate a return?</span>
+              <span class="text-xs transition-transform duration-300 group-open:rotate-180">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </span>
+            </summary>
+            <div class="mt-4 text-gray-500 leading-relaxed border-t border-gray-50 pt-4">
+              We accept returns within 30 days of receipt. Items must be in their original condition with all tags
+              attached. Use our automated portal to generate a prepaid shipping label.
+            </div>
+          </details>
+
+          <details class="group border border-gray-200 rounded-xl px-6 py-4 transition-all duration-300 hover:border-black bg-white">
+            <summary class="flex justify-between items-center font-semibold text-lg list-none cursor-pointer">
+              <span class="pr-4">Sustainability & Material Care</span>
+              <span class="text-xs transition-transform duration-300 group-open:rotate-180">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </span>
+            </summary>
+            <div class="mt-4 text-gray-500 leading-relaxed border-t border-gray-50 pt-4">
+              Each piece is crafted using ethically sourced materials. To prolong the life of your {{ product.title }},
+              we recommend cold washing and air drying away from direct sunlight.
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const triggers = document.querySelectorAll('.tab-trigger');
+    const panes = document.querySelectorAll('.tab-pane');
+
+    triggers.forEach((trigger) => {
+      trigger.addEventListener('click', function () {
+        const targetSelector = this.getAttribute('data-tab-target');
+        const targetPane = document.querySelector(targetSelector);
+
+        // 1. Update Header UI
+        triggers.forEach((t) => {
+          t.classList.remove('text-black', 'font-bold', 'border-black');
+          t.classList.add('text-gray-500', 'font-medium', 'border-transparent');
+        });
+        this.classList.add('text-black', 'font-bold', 'border-black');
+        this.classList.remove('text-gray-500', 'font-medium', 'border-transparent');
+
+        // 2. Switch Content Panes
+        panes.forEach((pane) => pane.classList.add('hidden'));
+        targetPane.classList.remove('hidden');
+      });
+    });
+
+    // Load More Simulation
+    const loadMoreBtn = document.getElementById('LoadMoreAction');
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener('click', function () {
+        this.textContent = 'Loading...';
+        setTimeout(() => {
+          this.textContent = 'No more reviews to show';
+          this.classList.add('opacity-50', 'cursor-not-allowed');
+        }, 1000);
+      });
+    }
+  });
+</script>
+
+<style>
+  /* Ensure smooth transitions */
+  .tab-pane.hidden {
+    display: none;
+  }
+  .animate-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var sectionId = {{ section.id | json }};
+    var mainImage = document.getElementById("MainProductImage");
+    var thumbs = document.querySelectorAll(".thumbnail-btn");
+    var productForm = document.querySelector('#ProductSection-' + sectionId + ' .product-form');
+    var variantIdInput = productForm ? productForm.querySelector('input[name="id"]') : null;
+    var productJsonEl = document.getElementById('ProductJson-' + sectionId) || document.querySelector('#ProductJson-' + sectionId + '-container script[type="application/json"]');
+    var productSection = document.getElementById('ProductSection-' + sectionId);
+    var priceEl = productSection ? productSection.querySelector('[data-variant-price]') : document.querySelector('[data-variant-price]');
+    var comparePriceEl = productSection ? productSection.querySelector('[data-variant-compare-price]') : document.querySelector('[data-variant-compare-price]');
+    var savingsEl = productSection ? productSection.querySelector('[data-variant-savings]') : document.querySelector('[data-variant-savings]');
+    var addToCartBtn = productSection ? productSection.querySelector('[data-add-to-cart-btn]') : document.querySelector('[data-add-to-cart-btn]');
+    var addToCartText = productSection ? productSection.querySelector('[data-add-to-cart-text]') : document.querySelector('[data-add-to-cart-text]');
+
+    // Thumbnail click: update main image
+    if (mainImage && thumbs.length) {
+      thumbs.forEach(btn => {
+        btn.addEventListener("click", () => {
+          mainImage.src = btn.dataset.imageUrl;
+          thumbs.forEach(t => { t.classList.remove("border-gray-300"); t.classList.add("border-transparent"); });
+          btn.classList.remove("border-transparent");
+          btn.classList.add("border-gray-300");
+        });
+      });
+    }
+
+    // Variant switching: image, price, add-to-cart
+    if (productJsonEl && productForm && variantIdInput) {
+      var productData;
+      try {
+        productData = JSON.parse(productJsonEl.textContent);
+      } catch (e) {
+        console.warn('Product JSON parse error:', e);
+        return;
+      }
+
+      var optionNames = productData.option_names || productData.options || [];
+
+      function getSelectedOptions() {
+        var selected = [];
+        for (var i = 0; i < optionNames.length; i++) {
+          var name = optionNames[i];
+          var input = productForm.querySelector('input[name="' + CSS.escape(name) + '"]:checked, select[name="' + CSS.escape(name) + '"]');
+          selected.push(input ? input.value : null);
+        }
+        return selected;
+      }
+
+      function findVariant(selectedOptions) {
+        var opts = selectedOptions || [];
+        var list = productData.variants || [];
+        for (var i = 0; i < list.length; i++) {
+          var v = list[i];
+          var o1 = String(v.option1 || '').toLowerCase();
+          var o2 = String(v.option2 || '').toLowerCase();
+          var o3 = String(v.option3 || '').toLowerCase();
+          var s1 = String(opts[0] || '').toLowerCase();
+          var s2 = String(opts[1] || '').toLowerCase();
+          var s3 = String(opts[2] || '').toLowerCase();
+          if ((!s1 || o1 === s1) && (!s2 || o2 === s2) && (!s3 || o3 === s3)) {
+            return v;
+          }
+        }
+        return null;
+      }
+
+      function syncThumbnailBorder(imageId) {
+        for (var i = 0; i < thumbs.length; i++) {
+          var btn = thumbs[i];
+          if (String(btn.dataset.imageId || '') === String(imageId || '')) {
+            btn.classList.remove("border-transparent");
+            btn.classList.add("border-gray-300");
+          } else {
+            btn.classList.remove("border-gray-300");
+            btn.classList.add("border-transparent");
+          }
+        }
+      }
+
+      function updateVariant(variant) {
+        variantIdInput.value = variant.id;
+
+        if (priceEl) priceEl.textContent = variant.price_formatted || '';
+
+        if (comparePriceEl) {
+          if (variant.compare_at_price && variant.compare_at_price > variant.price) {
+            comparePriceEl.textContent = variant.compare_at_price_formatted || '';
+            comparePriceEl.classList.remove("hidden");
+          } else {
+            comparePriceEl.classList.add("hidden");
+          }
+        }
+
+        if (savingsEl) {
+          if (variant.compare_at_price && variant.compare_at_price > variant.price) {
+            var pct = Math.round(((variant.compare_at_price - variant.price) / variant.compare_at_price) * 100);
+            savingsEl.textContent = '-' + pct + '%';
+            savingsEl.classList.remove("hidden");
+          } else {
+            savingsEl.classList.add("hidden");
+          }
+        }
+
+        if (addToCartBtn) {
+          addToCartBtn.disabled = !variant.available;
+        }
+        if (addToCartText) {
+          addToCartText.textContent = variant.available ? 'Add to Cart' : 'Sold Out';
+        }
+
+        if (mainImage && variant.featured_image) {
+          mainImage.src = variant.featured_image.src;
+          mainImage.alt = variant.featured_image.alt || '';
+          syncThumbnailBorder(variant.featured_image.id);
+        }
+      }
+
+      function onVariantChange() {
+        var selected = getSelectedOptions();
+        var variant = findVariant(selected);
+        if (variant) {
+          updateVariant(variant);
+        }
+      }
+
+      function handleOptionInteraction(e) {
+    // Force the radio button to be checked if the label/span was clicked
+    const label = e.target.closest('label');
+    if (label) {
+      const input = label.querySelector('input[type="radio"]');
+      if (input) input.checked = true;
+    }
+    onVariantChange();
+  }
+
+  // Ensure you are listening to the correct container
+  productForm.addEventListener('click', function(e) {
+    if (e.target.closest('.color-swatch') || e.target.closest('label')) {
+      handleOptionInteraction(e);
+    }
+  });
+
+      productForm.addEventListener('change', function(e) {
+        if (e.target.type === 'radio' || (e.target.tagName === 'SELECT' && e.target.name)) {
+          handleOptionInteraction();
+        }
+      });
+
+      productForm.addEventListener('click', function(e) {
+        if (e.target.closest && e.target.closest('label') && e.target.closest('label').querySelector('input[type="radio"]')) {
+          handleOptionInteraction();
+        }
+      });
+
+      onVariantChange();
+    }
+  });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const productForm = document.querySelector('.product-form');
+    const qtyInput = productForm?.querySelector('input[name="quantity"]');
+    const minusBtn = productForm?.querySelector('[data-qty-btn="minus"]');
+    const plusBtn = productForm?.querySelector('[data-qty-btn="plus"]');
+    const variantInput = productForm?.querySelector('input[name="id"]');
+
+    if (minusBtn && plusBtn && qtyInput) {
+      // Get max quantity from Shopify inventory
+      const getMaxQuantity = () => {
+        const variantId = variantInput?.value;
+        // Shopify will validate this on submission, set a reasonable default
+        return 999;
+      };
+
+      minusBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        let currentValue = parseInt(qtyInput.value) || 1;
+        if (currentValue > 1) {
+          qtyInput.value = currentValue - 1;
+        }
+      });
+
+      plusBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        let currentValue = parseInt(qtyInput.value) || 1;
+        const maxQty = getMaxQuantity();
+        if (currentValue < maxQty) {
+          qtyInput.value = currentValue + 1;
+        }
+      });
+
+      // Validate input on change
+      qtyInput.addEventListener('change', function () {
+        let value = parseInt(this.value) || 1;
+        if (value < 1) {
+          this.value = 1;
+        }
+      });
+    }
+  });
+</script>

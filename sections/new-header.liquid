@@ -1,4 +1,4 @@
-<div class="w-full h-[80px]  text-sm text-gray-600 ">
+<div class="w-full h-20 text-sm text-gray-600 ">
   <div class="flex justify-between items-center h-full px-6">
     
     <!-- Left Side -->
@@ -39,7 +39,7 @@
     <!-- Logo -->
     <div class="flex items-center space-x-3">
       {% if section.settings.logo_image %}
-        <img src="{{ section.settings.logo_image | image_url }}" class="h-10">
+        <img src="{{ section.settings.logo_image | image_url }}" alt="Logo" width="40" height="40" class="h-10 w-auto">
       {% else %}
         <div class="flex items-center gap-2">
           <span class="text-xl font-bold" style="color: {{ section.settings.brand_color }}">{{ section.settings.logo_text_main }}</span>
@@ -49,7 +49,7 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="hidden lg:flex justify-start items-center font-sans text-sm gap-4 w-full pl-[200px]">
+    <nav class="hidden lg:flex justify-start items-center font-sans text-sm gap-4 w-full pl-50">
       {% for link in linklists[section.settings.main_menu].links %}
        <a href="{{ link.url }}" class="flex items-center hover:text-green-600 uppercase ">
           {{ link.title }}
@@ -86,18 +86,18 @@
       </div>
 
       <!-- Cart -->
-      <div class="flex items-center space-x-3">
+      <a href="{{ routes.cart_url }}" class="flex items-center space-x-3 cursor-pointer hover:opacity-75 transition">
         <div class="relative p-3 bg-gray-50 rounded-full">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
           </svg>
-          <span class="absolute top-0 right-0 bg-green-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">0</span>
+          <span id="cart-count" class="absolute top-0 right-0 bg-green-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">0</span>
         </div>
         <div class="hidden xl:block">
           <p class="text-[10px] text-gray-400 font-bold uppercase">Cart</p>
-          <p class="text-sm font-black">{{ cart.total_price | money }}</p>
+          <p id="cart-total" class="text-sm font-black">{{ cart.total_price | money }}</p>
         </div>
-      </div>
+      </a>
 
     </div>
   </div>

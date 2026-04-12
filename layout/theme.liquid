@@ -24,6 +24,7 @@
     
     {% # Load and preload the critical CSS %}
     {{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}
+    {{ 'cart.js' | asset_url | script_tag }}
 
     {% # Social, title, etc. %}
     {% render 'meta-tags' %}
@@ -41,6 +42,7 @@
     {% section 'new-header' %}
     
     {{ content_for_layout }}
+    
     
     {% sections 'footer-group' %}
   </body>
